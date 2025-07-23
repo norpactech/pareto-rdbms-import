@@ -1,2 +1,2 @@
-# pareto-rdbms-import
-Relational Database Import - Uses Schema Crawler
+# Pareto Factory
+Application for housing Pareto Code Generators'
