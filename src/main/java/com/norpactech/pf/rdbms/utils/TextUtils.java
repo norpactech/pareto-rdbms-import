@@ -1,4 +1,5 @@
 package com.norpactech.pf.rdbms.utils;
+import java.util.Map;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  * 
@@ -204,5 +205,22 @@ public class TextUtils {
       return shortClassName;
     }
     return "set" + shortClassName.substring(0, 1).toUpperCase() + shortClassName.substring(1);
-  }  
+  }
+  
+  public static String toQueryString(Map<String, String> params) {
+
+    StringBuilder queryString = new StringBuilder();
+    if (params != null && !params.isEmpty()) {
+      queryString.append("?");
+      for (Map.Entry<String, String> entry : params.entrySet()) {
+        queryString.append(entry.getKey())
+        .append("=")
+        .append(entry.getValue())
+        .append("&");
+      }
+      queryString.setLength(queryString.length() - 1);
+      return queryString.toString();
+    }
+    return "";
+  }
 }

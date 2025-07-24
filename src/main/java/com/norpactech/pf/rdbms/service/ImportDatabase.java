@@ -27,7 +27,7 @@ public class ImportDatabase {
 
   private static final Logger logger = LoggerFactory.getLogger(ImportDatabase.class);
 
-  public static void importDatabase(String context) throws SQLException {
+  public static void importDatabase(String context, String username, String password, String dbSchema) throws SQLException {
 
     logger.info("Import Database Beginning with Schema: " + ParetoAPI.schema);
 
@@ -49,7 +49,11 @@ public class ImportDatabase {
             .withLoadOptions(loadOptionsBuilder.toOptions());
 
     // Get the schema definition
-    final Catalog catalog = SchemaCrawlerUtility.getCatalog(getDataSource(), options);
+    final Catalog catalog = SchemaCrawlerUtility.getCatalog(getDataSource(username, password, dbSchema), options);
+    
+    
+    
+    
 
     for (final Schema schema : catalog.getSchemas()) {
       System.out.println(schema);
@@ -63,9 +67,9 @@ public class ImportDatabase {
     logger.info("Import Database Completed with Schema: " + ParetoAPI.schema);
   }
   
-  private static DatabaseConnectionSource getDataSource() {
-    final String connectionUrl = "jdbc:mysql://localhost:3306/ub";
+  private static DatabaseConnectionSource getDataSource(String username, String password, String dbSchema) {
+    final String connectionUrl = "jdbc:mysql://localhost:3306/" + dbSchema;
     return DatabaseConnectionSources.newDatabaseConnectionSource(
-        connectionUrl, new MultiUseUserCredentials("root", "password"));
+        connectionUrl, new MultiUseUserCredentials(username, password));
   }
 }  

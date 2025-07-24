@@ -21,26 +21,25 @@ public class Application {
   
   public static void main(String[] args) throws Exception {
 
-    String driver = "com.mysql.cj.jdbc.Driver";
-    String url = "jdbc:mysql://localhost:3306/ub";
-    String username = "root";
-    String password = "password";
+    String username = "scott@norpactech.com";
+    String password = "G00seEgg!";
+    String host = "http://localhost:8087";
+    String tokenUri = "access-token";
+    String apiVersion = "v01";
     
-    String apiUsername = "scott@norpactech.com";
-    String apiPassword = "G00seEgg!";
-    // String tokenUrl = "https://dev.api.paretofactory.com/access-token";
-    String tokenUrl = "http://localhost:8087/access-token";
     
     String tenant = "norpac"; 
     String schema = "unitedbins"; 
     String context = "mysql";
     
+    String dbUsername = "root";
+    String dbPassword = "password";
+    
     try {
       logger.info("Pareto Factory Import Beginning");
-      Datasource.connect(driver, url, username, password);
+      ParetoAPI.configure(host, apiVersion, tokenUri, tenant, schema, username, password);
       
-      ParetoAPI.configure(tokenUrl, tenant, schema, apiUsername, apiPassword);
-      ImportDatabase.importDatabase(context);
+      ImportDatabase.importDatabase(context, dbUsername, dbPassword, ParetoAPI.dbSchema);
       
       logger.info("Pareto Factory Import Completed Successfully");
       System.exit(0);

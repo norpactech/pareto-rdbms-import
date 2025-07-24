@@ -6,47 +6,61 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.norpactech.pf.rdbms.vo.DownloadRequestVO;
-import com.norpactech.pf.rdbms.vo.DownloadResponseVO;
+import com.norpactech.pf.rdbms.config.ParetoAPI;
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
 
 public class NetUtils {
 
-  final static Logger log = LoggerFactory.getLogger(NetUtils.class);
+  final static Logger logger = LoggerFactory.getLogger(NetUtils.class);
 
-  public static DownloadResponseVO downloadRequest(String host, String jwt, DownloadRequestVO downloadRequest) throws Exception {
-    
-    URL url = new URL(host + "/v01/generator/download");
+  public static ApiResponse health() throws Exception {
+
+    URL url = new URL(ParetoAPI.host + "/health");
+
     okhttp3.Response response = null;
+    OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-    try {
-      String json = new Gson().toJson(downloadRequest);
-      
-      OkHttpClient client = new OkHttpClient().newBuilder().build();
-      MediaType mediaType = MediaType.parse("application/json");
-      RequestBody body = RequestBody.create(json, mediaType);
-      
-      okhttp3.Request request = new okhttp3.Request.Builder()
-          .url(url)
-          .method("POST", body)
-          .addHeader("Accept", "application/json")
-          .addHeader("Content-Type", "application/json")
-          .addHeader("Authorization", "Bearer " + jwt)
-          .build();
-      response = client.newCall(request).execute();       
-    } 
-    catch (Exception e) {
-      log.info("Download request failed: " + e.getMessage());
-      throw e;
-    }
+    okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
+        .url(url)
+        .get()
+        .addHeader("Accept", "application/json")
+        .addHeader("Content-Type", "application/json");
+
+    okhttp3.Request request = requestBuilder.build();
+    response = client.newCall(request).execute();       
+
     int responseCode = response.code();
     if (responseCode > 299) {
-      log.info("Download request failed: " + response.message());
-      throw new RuntimeException("Failed : HTTP error code : " + responseCode);
+      throw new Exception("GET Request Failed: " + response.message());
     }
-    return new DownloadResponseVO(responseCode, response.body().bytes());
-  }
+    Object retVal = new String(response.body().bytes());
+    return new ApiResponse(retVal);
+  }    
+  
+  public static ApiResponse get(ApiGetRequest apiGetRequest) throws Exception {
+
+    String version = ParetoAPI.apiVersion == null ? "" : "/" + ParetoAPI.apiVersion;
+    String queryString = TextUtils.toQueryString(apiGetRequest.getParams());
+    URL url = new URL(ParetoAPI.host + version + apiGetRequest.getUri() + queryString.toString());
+
+    okhttp3.Response response = null;
+    OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+    okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
+        .url(url)
+        .get()
+        .addHeader("Accept", "application/json")
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Authorization", "Bearer " + ParetoAPI.jwt);
+    
+    okhttp3.Request request = requestBuilder.build();
+    response = client.newCall(request).execute();       
+
+    int responseCode = response.code();
+    if (responseCode > 299) {
+      throw new Exception("GET Request Failed: " + response.message());
+    }
+    return new Gson().fromJson(response.body().string(), ApiResponse.class);
+  }  
 }
