@@ -1,8 +1,5 @@
 package com.norpactech.pf.rdbms.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +8,8 @@ import com.google.gson.JsonParser;
 import com.norpactech.pf.rdbms.api.model.Schema;
 import com.norpactech.pf.rdbms.api.model.Tenant;
 import com.norpactech.pf.rdbms.enums.EnumStatus;
-import com.norpactech.pf.rdbms.utils.ApiGetRequest;
+import com.norpactech.pf.rdbms.repository.SchemaRepository;
+import com.norpactech.pf.rdbms.repository.TenantRepository;
 import com.norpactech.pf.rdbms.utils.ApiResponse;
 import com.norpactech.pf.rdbms.utils.AuthUtils;
 import com.norpactech.pf.rdbms.utils.NetUtils;
@@ -52,7 +50,8 @@ public class ParetoAPI {
     }
     else {
       throw new Exception ("Null API Version!");
-    }    
+    }
+    
     ApiResponse health = NetUtils.health();
     
     JsonObject jsonObject = JsonParser.parseString(health.getData().toString()).getAsJsonObject();
@@ -66,29 +65,23 @@ public class ParetoAPI {
     jwt = AuthUtils.getJwt(host + "/" + tokenUrl, jwtRequest);
     logger.info("User '{}' Signed In", jwtRequest.getEmail());
     
-    ApiGetRequest tenantGetRequest = new ApiGetRequest("/tenant", new HashMap<>(Map.of("name",  tenantName)));
-    ApiResponse tenantResponse = NetUtils.get(tenantGetRequest);
-
-    if (tenantResponse.getData() == null) {
-      throw new Exception("'" + ParetoAPI.tenant + "' Tenant not found. Terminating!");
+    tenant = new TenantRepository().findOne(tenantName);
+    if (tenant != null) {
+      logger.info("Tenant: '{}' Initialized", tenant.getName());
     }
-    tenant = tenantResponse.readObject(Tenant.class);
-    logger.info("Tenant: '{}' Initialized", tenant.getName());
-    
-    ApiGetRequest schemaGetRequest = new ApiGetRequest("/schema", new HashMap<>(Map.of("name",  schemaName)));
-    ApiResponse schemaResponse = NetUtils.get(schemaGetRequest);
-
-    if (schemaResponse.getData() == null) {
-      throw new Exception("'" + ParetoAPI.tenant + "' Tenant not found. Terminating!");
+    else {
+      throw new Exception("Tenant '" + tenantName + "' was not initialized! Terminating...");
     }
-    schema = schemaResponse.readObject(Schema.class);
+    schema = new SchemaRepository().findOne(tenant.getId(), schemaName);
+    if (tenant != null) {
+      logger.info("Schema: '{}' Initialized", schema.getName());
+    }
+    else {
+      throw new Exception("Schema '" + schemaName + "' was not initialized! Terminating...");
+    }
     dbSchema = schema.getDatabase();
     logger.info("Schema: '{}' Initialized with database schema: '{}'", schema.getName(), schema.getDatabase());
     
     logger.info("Pareto API Successfully Configured");
   }  
-  
-  public static String getJWT() {
-    return jwt;
-  }
 }

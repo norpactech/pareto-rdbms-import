@@ -7,15 +7,24 @@ import java.util.Map;
  */
 public class ApiGetRequest {
 
+  Class<?> clazz;
   String uri;
   Map<String, String> params = new HashMap<String, String>();
   
-  public ApiGetRequest(String uri, Map<String, String> params) {
+  public ApiGetRequest(Class<?> clazz, String uri, Map<String, String> params) {
     
     this.uri = uri;
     if (params != null) {
       this.params = params;
     }
+  }
+
+  public Class<?> getClazz() {
+    return clazz;
+  }
+
+  public void setClazz(Class<?> clazz) {
+    this.clazz = clazz;
   }
 
   public String getUri() {
