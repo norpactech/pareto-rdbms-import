@@ -318,6 +318,7 @@ public class ImportDatabase {
       }
       else {
         CardinalityPutApiRequest putRequest = new CardinalityPutApiRequest();
+        putRequest.setId(cardinality.getId());
         putRequest.setIdRtCardinality(oneToMany.getId());
         if (foreignKeyProperty.getIsNullable()) {
           putRequest.setIdRtCardinalityStrength(cardinality.getIdRtCardinalityStrength());

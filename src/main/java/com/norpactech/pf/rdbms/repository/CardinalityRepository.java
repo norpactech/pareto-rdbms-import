@@ -21,7 +21,7 @@ public class CardinalityRepository extends ParetoApiRepository<Cardinality> {
 
   public Cardinality findOne(UUID idDataObject, UUID idProperty) throws Exception {
     
-    return findOne(Cardinality.class, new HashMap<>(Map.of("idDataObject ", idDataObject.toString(), "idProperty ", idProperty.toString())));
+    return findOne(Cardinality.class, new HashMap<>(Map.of("idDataObject", idDataObject.toString(), "idProperty", idProperty.toString())));
   } 
   
   public List<Cardinality> findAll(UUID idDataObject) throws Exception {
