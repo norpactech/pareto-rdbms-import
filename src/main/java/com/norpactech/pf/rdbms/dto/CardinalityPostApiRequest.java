@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.Hidden;
  public class CardinalityPostApiRequest {
 
   private UUID idProperty;
-  private UUID idObjectReference;
+  private UUID idDataObject;
   private UUID idRtCardinality;
   private UUID idRtCardinalityStrength;
   private Boolean hasReferencialAction;
@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.Hidden;
     var request = new LinkedHashMap<String, Object>();
     request.put("sql", "SELECT pareto.i_cardinality(?,?,?,?,?,?)");
     request.put("idProperty", this.idProperty);
-    request.put("idObjectReference", this.idObjectReference);
+    request.put("idDataObject", this.idDataObject);
     request.put("idRtCardinality", this.idRtCardinality);
     request.put("idRtCardinalityStrength", this.idRtCardinalityStrength);
     request.put("hasReferencialAction", this.hasReferencialAction);
@@ -51,12 +51,12 @@ import io.swagger.v3.oas.annotations.Hidden;
     return this.idProperty = idProperty;
   }    
     
-  public UUID getIdObjectReference() {
-    return this.idObjectReference;
+  public UUID getIdDataObject() {
+    return this.idDataObject;
   }
     
-  public UUID setIdObjectReference(UUID idObjectReference) {
-    return this.idObjectReference = idObjectReference;
+  public UUID setIdDataObject(UUID idDataObject) {
+    return this.idDataObject = idDataObject;
   }    
     
   public UUID getIdRtCardinality() {

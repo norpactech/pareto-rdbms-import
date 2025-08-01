@@ -18,8 +18,8 @@ public class Cardinality extends BaseModel {
   private UUID id;
   private UUID idProperty;
   private String propertyName;
-  private UUID idObjectReference;
-  private String objectReferenceName;
+  private UUID idDataObject;
+  private String dataObjectName;
   private UUID idRtCardinality;
   private UUID idRtCardinalityStrength;
   private Boolean hasReferencialAction;
@@ -38,8 +38,8 @@ public class Cardinality extends BaseModel {
     UUID id,
     UUID idProperty,
     String propertyName,
-    UUID idObjectReference,
-    String objectReferenceName,
+    UUID idDataObject,
+    String dataObjectName,
     UUID idRtCardinality,
     UUID idRtCardinalityStrength,
     Boolean hasReferencialAction,
@@ -52,8 +52,8 @@ public class Cardinality extends BaseModel {
     this.id = id;
     this.idProperty = idProperty;
     this.propertyName = propertyName;
-    this.idObjectReference = idObjectReference;
-    this.objectReferenceName = objectReferenceName;
+    this.idDataObject = idDataObject;
+    this.dataObjectName = dataObjectName;
     this.idRtCardinality = idRtCardinality;
     this.idRtCardinalityStrength = idRtCardinalityStrength;
     this.hasReferencialAction = hasReferencialAction;
@@ -70,10 +70,10 @@ public class Cardinality extends BaseModel {
     matchedParams.put("sql", 
       "SELECT pareto.cardinality.*, " + 
       "pareto.property.name as property_name, " + 
-      "pareto.data_object.name as object_reference_name " + 
+      "pareto.data_object.name as data_object_name " + 
       "FROM pareto.cardinality " + 
       "JOIN pareto.property on (pareto.property.id = pareto.cardinality.id_property) " + 
-      "JOIN pareto.data_object on (pareto.data_object.id = pareto.cardinality.id_object_reference)");
+      "JOIN pareto.data_object on (pareto.data_object.id = pareto.cardinality.id_data_object)");
     return matchedParams;
   }
 
@@ -103,20 +103,20 @@ public class Cardinality extends BaseModel {
     return this.propertyName = propertyName;
   }    
     
-  public UUID getIdObjectReference() {
-    return this.idObjectReference;
+  public UUID getIdDataObject() {
+    return this.idDataObject;
   }
     
-  public UUID setIdObjectReference(UUID idObjectReference) {
-    return this.idObjectReference = idObjectReference;
+  public UUID setIdDataObject(UUID idDataObject) {
+    return this.idDataObject = idDataObject;
   }    
     
-  public String getObjectReferenceName() {
-    return this.objectReferenceName;
+  public String getDataObjectName() {
+    return this.dataObjectName;
   }
     
-  public String setObjectReferenceName(String objectReferenceName) {
-    return this.objectReferenceName = objectReferenceName;
+  public String setDataObjectName(String dataObjectName) {
+    return this.dataObjectName = dataObjectName;
   }    
     
   public UUID getIdRtCardinality() {

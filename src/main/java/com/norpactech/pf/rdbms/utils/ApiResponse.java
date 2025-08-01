@@ -123,6 +123,13 @@ public class ApiResponse {
         Field field = clazz.getDeclaredField(fieldName);
         field.setAccessible(true);
 
+        if (field.getType() == java.lang.Integer.class) {
+          String value = fieldValue.toString();
+          if (value.contains(".")) {
+            fieldValue = Integer.valueOf(value.split("\\.")[0]);
+          }
+        }
+        
         if (field.getType() == java.util.UUID.class && fieldValue instanceof String) {
           fieldValue = UUID.fromString((String) fieldValue);
         }

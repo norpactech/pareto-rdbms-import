@@ -22,8 +22,8 @@ public class PropertyPutApiRequest {
 
   private UUID id;
   private UUID idGenericDataType;
-  private UUID idValidation;
   private UUID idGenericPropertyType;
+  private UUID idValidation;
   private Integer sequence;
   private String name;
   private String description;
@@ -45,8 +45,8 @@ public class PropertyPutApiRequest {
     request.put("sql", "SELECT pareto.u_property(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     request.put("id", this.id);
     request.put("idGenericDataType", this.idGenericDataType);
-    request.put("idValidation", this.idValidation);
     request.put("idGenericPropertyType", this.idGenericPropertyType);
+    request.put("idValidation", this.idValidation);
     request.put("sequence", this.sequence);
     request.put("name", this.name);
     request.put("description", this.description);
@@ -79,20 +79,20 @@ public class PropertyPutApiRequest {
     return this.idGenericDataType = idGenericDataType;
   }    
     
-  public UUID getIdValidation() {
-    return this.idValidation;
-  }
-    
-  public UUID setIdValidation(UUID idValidation) {
-    return this.idValidation = idValidation;
-  }    
-    
   public UUID getIdGenericPropertyType() {
     return this.idGenericPropertyType;
   }
     
   public UUID setIdGenericPropertyType(UUID idGenericPropertyType) {
     return this.idGenericPropertyType = idGenericPropertyType;
+  }    
+    
+  public UUID getIdValidation() {
+    return this.idValidation;
+  }
+    
+  public UUID setIdValidation(UUID idValidation) {
+    return this.idValidation = idValidation;
   }    
     
   public Integer getSequence() {

@@ -21,8 +21,8 @@ import io.swagger.v3.oas.annotations.Hidden;
 
   private UUID idDataObject;
   private UUID idGenericDataType;
-  private UUID idValidation;
   private UUID idGenericPropertyType;
+  private UUID idValidation;
   private Integer sequence;
   private String name;
   private String description;
@@ -43,8 +43,8 @@ import io.swagger.v3.oas.annotations.Hidden;
     request.put("sql", "SELECT pareto.i_property(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
     request.put("idDataObject", this.idDataObject);
     request.put("idGenericDataType", this.idGenericDataType);
-    request.put("idValidation", this.idValidation);
     request.put("idGenericPropertyType", this.idGenericPropertyType);
+    request.put("idValidation", this.idValidation);
     request.put("sequence", this.sequence);
     request.put("name", this.name);
     request.put("description", this.description);
@@ -76,20 +76,20 @@ import io.swagger.v3.oas.annotations.Hidden;
     return this.idGenericDataType = idGenericDataType;
   }    
     
-  public UUID getIdValidation() {
-    return this.idValidation;
-  }
-    
-  public UUID setIdValidation(UUID idValidation) {
-    return this.idValidation = idValidation;
-  }    
-    
   public UUID getIdGenericPropertyType() {
     return this.idGenericPropertyType;
   }
     
   public UUID setIdGenericPropertyType(UUID idGenericPropertyType) {
     return this.idGenericPropertyType = idGenericPropertyType;
+  }    
+    
+  public UUID getIdValidation() {
+    return this.idValidation;
+  }
+    
+  public UUID setIdValidation(UUID idValidation) {
+    return this.idValidation = idValidation;
   }    
     
   public Integer getSequence() {

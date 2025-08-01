@@ -223,4 +223,8 @@ public class TextUtils {
     }
     return "";
   }
+  
+  public static String lastDelimetedValue(String fullValue, String delimeter) {
+    return fullValue.substring(fullValue.lastIndexOf(delimeter) + 1);
+  }
 }
