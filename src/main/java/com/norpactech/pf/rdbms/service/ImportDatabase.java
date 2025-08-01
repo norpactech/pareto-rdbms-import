@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.norpactech.pf.rdbms.api.model.Cardinality;
 import com.norpactech.pf.rdbms.api.model.Context;
 import com.norpactech.pf.rdbms.api.model.ContextDataType;
+import com.norpactech.pf.rdbms.api.model.DataIndex;
+import com.norpactech.pf.rdbms.api.model.DataIndexProperty;
 import com.norpactech.pf.rdbms.api.model.DataObject;
 import com.norpactech.pf.rdbms.api.model.GenericPropertyType;
 import com.norpactech.pf.rdbms.api.model.Property;
@@ -22,6 +24,10 @@ import com.norpactech.pf.rdbms.api.model.Validation;
 import com.norpactech.pf.rdbms.config.ParetoAPI;
 import com.norpactech.pf.rdbms.dto.CardinalityPostApiRequest;
 import com.norpactech.pf.rdbms.dto.CardinalityPutApiRequest;
+import com.norpactech.pf.rdbms.dto.DataIndexPostApiRequest;
+import com.norpactech.pf.rdbms.dto.DataIndexPropertyPostApiRequest;
+import com.norpactech.pf.rdbms.dto.DataIndexPropertyPutApiRequest;
+import com.norpactech.pf.rdbms.dto.DataIndexPutApiRequest;
 import com.norpactech.pf.rdbms.dto.DataObjectPostApiRequest;
 import com.norpactech.pf.rdbms.dto.DataObjectPutApiRequest;
 import com.norpactech.pf.rdbms.dto.PropertyPostApiRequest;
@@ -29,6 +35,8 @@ import com.norpactech.pf.rdbms.dto.PropertyPutApiRequest;
 import com.norpactech.pf.rdbms.repository.CardinalityRepository;
 import com.norpactech.pf.rdbms.repository.ContextDataTypeRepository;
 import com.norpactech.pf.rdbms.repository.ContextRepository;
+import com.norpactech.pf.rdbms.repository.DataIndexPropertyRepository;
+import com.norpactech.pf.rdbms.repository.DataIndexRepository;
 import com.norpactech.pf.rdbms.repository.DataObjectRepository;
 import com.norpactech.pf.rdbms.repository.GenericPropertyTypeRepository;
 import com.norpactech.pf.rdbms.repository.PropertyRepository;
@@ -43,6 +51,8 @@ import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
+import schemacrawler.schema.Index;
+import schemacrawler.schema.IndexColumn;
 import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
@@ -68,6 +78,8 @@ public class ImportDatabase {
   private static final RefTableTypeRepository refTableTypeRepository = new RefTableTypeRepository();
   private static final RefTablesRepository refTablesRepository = new RefTablesRepository();
   private static final CardinalityRepository cardinalityRepository = new CardinalityRepository();
+  private static final DataIndexRepository dataIndexRepository = new DataIndexRepository();
+  private static final DataIndexPropertyRepository dataIndexPropertyRepository = new DataIndexPropertyRepository();
   
   public static void importDatabase(String context, String username, String password, String dbSchema) throws Exception {
     
@@ -105,6 +117,7 @@ public class ImportDatabase {
     Collection<Table> tables = catalog.getTables(catalogSchema);
     importTables(tables, paretoContext);    
     importCardinality(tables);    
+    importIndexes(tables);    
     logger.info("Import Database Completed with Schema: " + ParetoAPI.schema);
   }
 
@@ -333,6 +346,96 @@ public class ImportDatabase {
         cardinalityRepository.save(putRequest);
       }
     }
+  }
+  
+  private static void importIndexes(Collection<Table> tables) throws Exception {
+
+    RefTableType indexType = refTableTypeRepository.findOne(Constant.INDEX_TYPE); 
+    if (indexType == null) {
+      throw new Exception ("Index Type Table Type not found! Terminating...");
+    }
+    RefTables uniqueIndex = refTablesRepository.findOne(indexType.getId(), Constant.UNIQUE_INDEX);
+    RefTables nonUniqueIndex = refTablesRepository.findOne(indexType.getId(), Constant.INDEX);
+
+    RefTableType rtSortOrder = refTableTypeRepository.findOne(Constant.SORT_ORDER); 
+    if (rtSortOrder == null) {
+      throw new Exception ("Sort Order Table Type not found! Terminating...");
+    }
+    RefTables ascending = refTablesRepository.findOne(rtSortOrder.getId(), Constant.ASCENDING);
+    RefTables descending = refTablesRepository.findOne(rtSortOrder.getId(), Constant.DESCENDING);
+    
+    for (Table table : tables) {
+      DataObject dataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), table.getName());
+
+      for (Index index : table.getIndexes()) {
+        String indexName = index.getName().equalsIgnoreCase("PRIMARY") ? "primary_key" : index.getName().toLowerCase();
+        // Don't process foreign keys, as that is done in cardinality and plug-ins
+        if (indexName.startsWith("fk_")) {
+          continue;
+        }
+        DataIndex dataIndex = dataIndexRepository.findOne(dataObject.getId(), indexName);
+        UUID rtIndexType = index.isUnique() ? uniqueIndex.getId() : nonUniqueIndex.getId();
+        
+        if (dataIndex == null) {
+          DataIndexPostApiRequest request = new DataIndexPostApiRequest();
+          request.setIdDataObject(dataObject.getId());
+          request.setIdRtIndexType(rtIndexType);
+          request.setName(indexName);
+          request.setCreatedBy("RDBMS Import Post");
+          dataIndexRepository.save(request); 
+
+          dataIndex = dataIndexRepository.findOne(dataObject.getId(), indexName);
+        }
+        else {
+          DataIndexPutApiRequest request = new DataIndexPutApiRequest();
+          request.setId(dataIndex.getId());
+          request.setIdRtIndexType(rtIndexType);
+          request.setName(indexName);
+          request.setUpdatedAt(dataIndex.getUpdatedAt());
+          request.setUpdatedBy("RDBMS Import Put");
+          dataIndexRepository.save(request); 
+        }
+        
+        int sequence = 0;
+        for (IndexColumn column : index.getColumns()) {
+          String columnName = column.getName().toLowerCase();
+          Property property = propertyRepository.findOne(dataObject.getId(), columnName);
+          if (property == null) {
+            throw new Exception ("Null Property on Index Column: " + columnName);
+          }
+          DataIndexProperty dataIndexProperty = dataIndexPropertyRepository.findOne(dataIndex.getId(), property.getId());
+          String sortOrder = column.getSortSequence().name();
+          UUID idSortOrder = null;
+          
+          if (sortOrder.equalsIgnoreCase(ascending.getName())) {
+            idSortOrder = ascending.getId();
+          }
+          else {
+            idSortOrder = descending.getId();
+          }
+            
+          if (dataIndexProperty == null) {
+            DataIndexPropertyPostApiRequest request = new DataIndexPropertyPostApiRequest();
+            request.setIdDataIndex(dataIndex.getId());
+            request.setIdProperty(property.getId());
+            request.setIdRtSortOrder(idSortOrder);
+            request.setSequence(++sequence);
+            request.setCreatedBy("RDBMS Import Post");
+            dataIndexPropertyRepository.save(request);
+          }
+          else {
+            DataIndexPropertyPutApiRequest request = new DataIndexPropertyPutApiRequest();
+            request.setId(dataIndexProperty.getId());
+            request.setIdProperty(property.getId());
+            request.setIdRtSortOrder(idSortOrder);
+            request.setSequence(++sequence);
+            request.setUpdatedAt(dataIndexProperty.getUpdatedAt());
+            request.setUpdatedBy("RDBMS Import Put");
+            dataIndexPropertyRepository.save(request);
+          }         
+        }      
+      }
+    }   
   }
   
   private static DatabaseConnectionSource getDataSource(String username, String password, String dbSchema) {

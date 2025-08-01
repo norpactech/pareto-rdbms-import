@@ -10,6 +10,14 @@ public class Constant {
   public static final String CARDINALITY_TABLE_TYPE = "cardinality";
   public static final String CARDINALITY_STRENGTH_TABLE_TYPE = "cardinality_strength";
   
+  public static final String INDEX_TYPE = "index_type";
+  public static final String UNIQUE_INDEX = "Unique";
+  public static final String INDEX = "Index";
+
+  public static final String SORT_ORDER = "sort_order";
+  public static final String ASCENDING = "Ascending";
+  public static final String DESCENDING = "Descending";
+    
   public static final String ONE_TO_MANY = "1:M";
   public static final String MANY_TO_ONE = "M:1";
   public static final String MANY_TO_MANY = "M:M";
