@@ -21,10 +21,10 @@ public class Property extends BaseModel {
   private String dataObjectName;
   private UUID idGenericDataType;
   private String genericDataTypeName;
-  private UUID idValidation;
-  private String validationName;
   private UUID idGenericPropertyType;
   private String genericPropertyTypeName;
+  private UUID idValidation;
+  private String validationName;
   private Integer sequence;
   private String name;
   private String description;
@@ -51,10 +51,10 @@ public class Property extends BaseModel {
     String dataObjectName,
     UUID idGenericDataType,
     String genericDataTypeName,
-    UUID idValidation,
-    String validationName,
     UUID idGenericPropertyType,
     String genericPropertyTypeName,
+    UUID idValidation,
+    String validationName,
     Integer sequence,
     String name,
     String description,
@@ -75,10 +75,10 @@ public class Property extends BaseModel {
     this.dataObjectName = dataObjectName;
     this.idGenericDataType = idGenericDataType;
     this.genericDataTypeName = genericDataTypeName;
-    this.idValidation = idValidation;
-    this.validationName = validationName;
     this.idGenericPropertyType = idGenericPropertyType;
     this.genericPropertyTypeName = genericPropertyTypeName;
+    this.idValidation = idValidation;
+    this.validationName = validationName;
     this.sequence = sequence;
     this.name = name;
     this.description = description;
@@ -102,13 +102,13 @@ public class Property extends BaseModel {
       "SELECT pareto.property.*, " + 
       "pareto.data_object.name as data_object_name, " + 
       "pareto.generic_data_type.name as generic_data_type_name, " + 
-      "pareto.validation.name as validation_name, " + 
-      "pareto.generic_property_type.name as generic_property_type_name " + 
+      "pareto.generic_property_type.name as generic_property_type_name, " + 
+      "pareto.validation.name as validation_name " + 
       "FROM pareto.property " + 
       "JOIN pareto.data_object on (pareto.data_object.id = pareto.property.id_data_object) " + 
       "JOIN pareto.generic_data_type on (pareto.generic_data_type.id = pareto.property.id_generic_data_type) " + 
-      "LEFT JOIN pareto.validation on (pareto.validation.id = pareto.property.id_validation) " + 
-      "LEFT JOIN pareto.generic_property_type on (pareto.generic_property_type.id = pareto.property.id_generic_property_type)");
+      "LEFT JOIN pareto.generic_property_type on (pareto.generic_property_type.id = pareto.property.id_generic_property_type) " + 
+      "LEFT JOIN pareto.validation on (pareto.validation.id = pareto.property.id_validation)");
     return matchedParams;
   }
 
@@ -154,22 +154,6 @@ public class Property extends BaseModel {
     return this.genericDataTypeName = genericDataTypeName;
   }    
     
-  public UUID getIdValidation() {
-    return this.idValidation;
-  }
-    
-  public UUID setIdValidation(UUID idValidation) {
-    return this.idValidation = idValidation;
-  }    
-    
-  public String getValidationName() {
-    return this.validationName;
-  }
-    
-  public String setValidationName(String validationName) {
-    return this.validationName = validationName;
-  }    
-    
   public UUID getIdGenericPropertyType() {
     return this.idGenericPropertyType;
   }
@@ -184,6 +168,22 @@ public class Property extends BaseModel {
     
   public String setGenericPropertyTypeName(String genericPropertyTypeName) {
     return this.genericPropertyTypeName = genericPropertyTypeName;
+  }    
+    
+  public UUID getIdValidation() {
+    return this.idValidation;
+  }
+    
+  public UUID setIdValidation(UUID idValidation) {
+    return this.idValidation = idValidation;
+  }    
+    
+  public String getValidationName() {
+    return this.validationName;
+  }
+    
+  public String setValidationName(String validationName) {
+    return this.validationName = validationName;
   }    
     
   public Integer getSequence() {
