@@ -21,12 +21,11 @@ public class AuthUtils {
   public static String getJwt(String tokenUrl, JwtRequestVO jwtRequest) throws Exception {
 
     URL url = new URL(tokenUrl);
-    String accessToken = null;
     okhttp3.Response response = null;
 
     OkHttpClient client = new OkHttpClient().newBuilder().build();
     okhttp3.FormBody formBody = new okhttp3.FormBody.Builder()
-        .add("username", jwtRequest.getEmail())  // Assuming email is used as username
+        .add("username", jwtRequest.getEmail())
         .add("password", jwtRequest.getPassword())
         .build();
 
@@ -47,7 +46,8 @@ public class AuthUtils {
         throw new Exception("Sign In Failed: " + error); 
       }
     }
-    JsonElement token = jsonObject.get("access_token");   
+    JsonElement token = jsonObject.get("access_token");
+    logger.info("Access Token successfully retrieved");
     return token.toString().replace("\"", "");
   }  
 }
