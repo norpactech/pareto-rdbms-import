@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.RefTables;
+import com.norpactech.pf.rdbms.model.RefTables;
 
 public class RefTablesRepository extends ParetoApiRepository<RefTables> {
 

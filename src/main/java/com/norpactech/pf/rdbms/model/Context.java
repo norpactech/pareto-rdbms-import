@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,32 +11,28 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: Tenant - Tenant Object
+ * API Model Class: Context - Platform Context (pgsql, java)
  */
-public class Tenant extends BaseModel {
+public class Context extends BaseModel {
 
   private UUID id;
   private String name;
   private String description;
-  private String copyright;
-  private String timeZone;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public Tenant () {}
-  public Tenant (Object obj) {
+  public Context () {}
+  public Context (Object obj) {
     super(obj);
   }
 
-  public Tenant (
+  public Context (
     UUID id,
     String name,
     String description,
-    String copyright,
-    String timeZone,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -46,8 +42,6 @@ public class Tenant extends BaseModel {
     this.id = id;
     this.name = name;
     this.description = description;
-    this.copyright = copyright;
-    this.timeZone = timeZone;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -57,10 +51,10 @@ public class Tenant extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, Tenant.class);
+    var matchedParams = paramMatcher(queryParams, Context.class);
     matchedParams.put("sql", 
-      "SELECT pareto.tenant.* " + 
-      "FROM pareto.tenant");
+      "SELECT pareto.context.* " + 
+      "FROM pareto.context");
     return matchedParams;
   }
 
@@ -88,22 +82,6 @@ public class Tenant extends BaseModel {
     
   public String setDescription(String description) {
     return this.description = description;
-  }    
-    
-  public String getCopyright() {
-    return this.copyright;
-  }
-    
-  public String setCopyright(String copyright) {
-    return this.copyright = copyright;
-  }    
-    
-  public String getTimeZone() {
-    return this.timeZone;
-  }
-    
-  public String setTimeZone(String timeZone) {
-    return this.timeZone = timeZone;
   }    
     
   public Timestamp getCreatedAt() {

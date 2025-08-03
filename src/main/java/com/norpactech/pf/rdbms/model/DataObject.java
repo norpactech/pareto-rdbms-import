@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,38 +11,38 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: Validation - Validations
+ * API Model Class: DataObject - Object
  */
-public class Validation extends BaseModel {
+public class DataObject extends BaseModel {
 
   private UUID id;
-  private UUID idTenant;
-  private String tenantName;
-  private UUID idRtValidationType;
+  private UUID idSchema;
+  private String schemaName;
   private String name;
   private String description;
-  private String errorMsg;
-  private String expression;
+  private Boolean hasIdentifier;
+  private Boolean hasAudit;
+  private Boolean hasActive;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public Validation () {}
-  public Validation (Object obj) {
+  public DataObject () {}
+  public DataObject (Object obj) {
     super(obj);
   }
 
-  public Validation (
+  public DataObject (
     UUID id,
-    UUID idTenant,
-    String tenantName,
-    UUID idRtValidationType,
+    UUID idSchema,
+    String schemaName,
     String name,
     String description,
-    String errorMsg,
-    String expression,
+    Boolean hasIdentifier,
+    Boolean hasAudit,
+    Boolean hasActive,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -50,13 +50,13 @@ public class Validation extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idTenant = idTenant;
-    this.tenantName = tenantName;
-    this.idRtValidationType = idRtValidationType;
+    this.idSchema = idSchema;
+    this.schemaName = schemaName;
     this.name = name;
     this.description = description;
-    this.errorMsg = errorMsg;
-    this.expression = expression;
+    this.hasIdentifier = hasIdentifier;
+    this.hasAudit = hasAudit;
+    this.hasActive = hasActive;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -66,12 +66,12 @@ public class Validation extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, Validation.class);
+    var matchedParams = paramMatcher(queryParams, DataObject.class);
     matchedParams.put("sql", 
-      "SELECT pareto.validation.*, " + 
-      "pareto.tenant.name as tenant_name " + 
-      "FROM pareto.validation " + 
-      "JOIN pareto.tenant on (pareto.tenant.id = pareto.validation.id_tenant)");
+      "SELECT pareto.data_object.*, " + 
+      "pareto.schema.name as schema_name " + 
+      "FROM pareto.data_object " + 
+      "JOIN pareto.schema on (pareto.schema.id = pareto.data_object.id_schema)");
     return matchedParams;
   }
 
@@ -85,28 +85,20 @@ public class Validation extends BaseModel {
     return this.id = id;
   }    
     
-  public UUID getIdTenant() {
-    return this.idTenant;
+  public UUID getIdSchema() {
+    return this.idSchema;
   }
     
-  public UUID setIdTenant(UUID idTenant) {
-    return this.idTenant = idTenant;
+  public UUID setIdSchema(UUID idSchema) {
+    return this.idSchema = idSchema;
   }    
     
-  public String getTenantName() {
-    return this.tenantName;
+  public String getSchemaName() {
+    return this.schemaName;
   }
     
-  public String setTenantName(String tenantName) {
-    return this.tenantName = tenantName;
-  }    
-    
-  public UUID getIdRtValidationType() {
-    return this.idRtValidationType;
-  }
-    
-  public UUID setIdRtValidationType(UUID idRtValidationType) {
-    return this.idRtValidationType = idRtValidationType;
+  public String setSchemaName(String schemaName) {
+    return this.schemaName = schemaName;
   }    
     
   public String getName() {
@@ -125,20 +117,28 @@ public class Validation extends BaseModel {
     return this.description = description;
   }    
     
-  public String getErrorMsg() {
-    return this.errorMsg;
+  public Boolean getHasIdentifier() {
+    return this.hasIdentifier;
   }
     
-  public String setErrorMsg(String errorMsg) {
-    return this.errorMsg = errorMsg;
+  public Boolean setHasIdentifier(Boolean hasIdentifier) {
+    return this.hasIdentifier = hasIdentifier;
   }    
     
-  public String getExpression() {
-    return this.expression;
+  public Boolean getHasAudit() {
+    return this.hasAudit;
   }
     
-  public String setExpression(String expression) {
-    return this.expression = expression;
+  public Boolean setHasAudit(Boolean hasAudit) {
+    return this.hasAudit = hasAudit;
+  }    
+    
+  public Boolean getHasActive() {
+    return this.hasActive;
+  }
+    
+  public Boolean setHasActive(Boolean hasActive) {
+    return this.hasActive = hasActive;
   }    
     
   public Timestamp getCreatedAt() {

@@ -3,7 +3,7 @@ package com.norpactech.pf.rdbms.repository;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.norpactech.pf.rdbms.api.model.Context;
+import com.norpactech.pf.rdbms.model.Context;
 
 public class ContextRepository extends ParetoApiRepository<Context> {
 

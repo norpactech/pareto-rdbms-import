@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.Validation;
+import com.norpactech.pf.rdbms.model.Validation;
 
 public class ValidationRepository extends ParetoApiRepository<Validation> {
   

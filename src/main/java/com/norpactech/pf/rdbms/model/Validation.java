@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,32 +11,38 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: DataIndex - Object Indexes
+ * API Model Class: Validation - Validations
  */
-public class DataIndex extends BaseModel {
+public class Validation extends BaseModel {
 
   private UUID id;
-  private UUID idDataObject;
-  private String dataObjectName;
-  private UUID idRtIndexType;
+  private UUID idTenant;
+  private String tenantName;
+  private UUID idRtValidationType;
   private String name;
+  private String description;
+  private String errorMsg;
+  private String expression;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public DataIndex () {}
-  public DataIndex (Object obj) {
+  public Validation () {}
+  public Validation (Object obj) {
     super(obj);
   }
 
-  public DataIndex (
+  public Validation (
     UUID id,
-    UUID idDataObject,
-    String dataObjectName,
-    UUID idRtIndexType,
+    UUID idTenant,
+    String tenantName,
+    UUID idRtValidationType,
     String name,
+    String description,
+    String errorMsg,
+    String expression,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -44,10 +50,13 @@ public class DataIndex extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idDataObject = idDataObject;
-    this.dataObjectName = dataObjectName;
-    this.idRtIndexType = idRtIndexType;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
+    this.idRtValidationType = idRtValidationType;
     this.name = name;
+    this.description = description;
+    this.errorMsg = errorMsg;
+    this.expression = expression;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -57,12 +66,12 @@ public class DataIndex extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, DataIndex.class);
+    var matchedParams = paramMatcher(queryParams, Validation.class);
     matchedParams.put("sql", 
-      "SELECT pareto.data_index.*, " + 
-      "pareto.data_object.name as data_object_name " + 
-      "FROM pareto.data_index " + 
-      "JOIN pareto.data_object on (pareto.data_object.id = pareto.data_index.id_data_object)");
+      "SELECT pareto.validation.*, " + 
+      "pareto.tenant.name as tenant_name " + 
+      "FROM pareto.validation " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.validation.id_tenant)");
     return matchedParams;
   }
 
@@ -76,28 +85,28 @@ public class DataIndex extends BaseModel {
     return this.id = id;
   }    
     
-  public UUID getIdDataObject() {
-    return this.idDataObject;
+  public UUID getIdTenant() {
+    return this.idTenant;
   }
     
-  public UUID setIdDataObject(UUID idDataObject) {
-    return this.idDataObject = idDataObject;
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
   }    
     
-  public String getDataObjectName() {
-    return this.dataObjectName;
+  public String getTenantName() {
+    return this.tenantName;
   }
     
-  public String setDataObjectName(String dataObjectName) {
-    return this.dataObjectName = dataObjectName;
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
-  public UUID getIdRtIndexType() {
-    return this.idRtIndexType;
+  public UUID getIdRtValidationType() {
+    return this.idRtValidationType;
   }
     
-  public UUID setIdRtIndexType(UUID idRtIndexType) {
-    return this.idRtIndexType = idRtIndexType;
+  public UUID setIdRtValidationType(UUID idRtValidationType) {
+    return this.idRtValidationType = idRtValidationType;
   }    
     
   public String getName() {
@@ -106,6 +115,30 @@ public class DataIndex extends BaseModel {
     
   public String setName(String name) {
     return this.name = name;
+  }    
+    
+  public String getDescription() {
+    return this.description;
+  }
+    
+  public String setDescription(String description) {
+    return this.description = description;
+  }    
+    
+  public String getErrorMsg() {
+    return this.errorMsg;
+  }
+    
+  public String setErrorMsg(String errorMsg) {
+    return this.errorMsg = errorMsg;
+  }    
+    
+  public String getExpression() {
+    return this.expression;
+  }
+    
+  public String setExpression(String expression) {
+    return this.expression = expression;
   }    
     
   public Timestamp getCreatedAt() {

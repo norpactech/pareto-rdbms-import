@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -12,36 +12,36 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: GenericDataType - Generic Data Types for a Logical Model
+ * API Model Class: DataIndexProperty - Object Index Properties
  */
-public class GenericDataType extends BaseModel {
+public class DataIndexProperty extends BaseModel {
 
   private UUID id;
-  private UUID idTenant;
-  private String tenantName;
+  private UUID idDataIndex;
+  private String dataIndexName;
+  private UUID idProperty;
+  private String propertyName;
+  private UUID idRtSortOrder;
   private Integer sequence;
-  private String name;
-  private String description;
-  private String alias;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public GenericDataType () {}
-  public GenericDataType (Object obj) {
+  public DataIndexProperty () {}
+  public DataIndexProperty (Object obj) {
     super(obj);
   }
 
-  public GenericDataType (
+  public DataIndexProperty (
     UUID id,
-    UUID idTenant,
-    String tenantName,
+    UUID idDataIndex,
+    String dataIndexName,
+    UUID idProperty,
+    String propertyName,
+    UUID idRtSortOrder,
     Integer sequence,
-    String name,
-    String description,
-    String alias,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -49,12 +49,12 @@ public class GenericDataType extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idTenant = idTenant;
-    this.tenantName = tenantName;
+    this.idDataIndex = idDataIndex;
+    this.dataIndexName = dataIndexName;
+    this.idProperty = idProperty;
+    this.propertyName = propertyName;
+    this.idRtSortOrder = idRtSortOrder;
     this.sequence = sequence;
-    this.name = name;
-    this.description = description;
-    this.alias = alias;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -64,12 +64,14 @@ public class GenericDataType extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, GenericDataType.class);
+    var matchedParams = paramMatcher(queryParams, DataIndexProperty.class);
     matchedParams.put("sql", 
-      "SELECT pareto.generic_data_type.*, " + 
-      "pareto.tenant.name as tenant_name " + 
-      "FROM pareto.generic_data_type " + 
-      "JOIN pareto.tenant on (pareto.tenant.id = pareto.generic_data_type.id_tenant)");
+      "SELECT pareto.data_index_property.*, " + 
+      "pareto.data_index.name as data_index_name, " + 
+      "pareto.property.name as property_name " + 
+      "FROM pareto.data_index_property " + 
+      "JOIN pareto.data_index on (pareto.data_index.id = pareto.data_index_property.id_data_index) " + 
+      "JOIN pareto.property on (pareto.property.id = pareto.data_index_property.id_property)");
     return matchedParams;
   }
 
@@ -83,20 +85,44 @@ public class GenericDataType extends BaseModel {
     return this.id = id;
   }    
     
-  public UUID getIdTenant() {
-    return this.idTenant;
+  public UUID getIdDataIndex() {
+    return this.idDataIndex;
   }
     
-  public UUID setIdTenant(UUID idTenant) {
-    return this.idTenant = idTenant;
+  public UUID setIdDataIndex(UUID idDataIndex) {
+    return this.idDataIndex = idDataIndex;
   }    
     
-  public String getTenantName() {
-    return this.tenantName;
+  public String getDataIndexName() {
+    return this.dataIndexName;
   }
     
-  public String setTenantName(String tenantName) {
-    return this.tenantName = tenantName;
+  public String setDataIndexName(String dataIndexName) {
+    return this.dataIndexName = dataIndexName;
+  }    
+    
+  public UUID getIdProperty() {
+    return this.idProperty;
+  }
+    
+  public UUID setIdProperty(UUID idProperty) {
+    return this.idProperty = idProperty;
+  }    
+    
+  public String getPropertyName() {
+    return this.propertyName;
+  }
+    
+  public String setPropertyName(String propertyName) {
+    return this.propertyName = propertyName;
+  }    
+    
+  public UUID getIdRtSortOrder() {
+    return this.idRtSortOrder;
+  }
+    
+  public UUID setIdRtSortOrder(UUID idRtSortOrder) {
+    return this.idRtSortOrder = idRtSortOrder;
   }    
     
   public Integer getSequence() {
@@ -105,30 +131,6 @@ public class GenericDataType extends BaseModel {
     
   public Integer setSequence(Integer sequence) {
     return this.sequence = sequence;
-  }    
-    
-  public String getName() {
-    return this.name;
-  }
-    
-  public String setName(String name) {
-    return this.name = name;
-  }    
-    
-  public String getDescription() {
-    return this.description;
-  }
-    
-  public String setDescription(String description) {
-    return this.description = description;
-  }    
-    
-  public String getAlias() {
-    return this.alias;
-  }
-    
-  public String setAlias(String alias) {
-    return this.alias = alias;
   }    
     
   public Timestamp getCreatedAt() {

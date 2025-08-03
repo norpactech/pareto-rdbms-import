@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,36 +11,32 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: Project - Pareto Project
+ * API Model Class: Tenant - Tenant Object
  */
-public class Project extends BaseModel {
+public class Tenant extends BaseModel {
 
   private UUID id;
-  private UUID idSchema;
-  private String schemaName;
   private String name;
   private String description;
-  private String domain;
-  private String artifact;
+  private String copyright;
+  private String timeZone;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public Project () {}
-  public Project (Object obj) {
+  public Tenant () {}
+  public Tenant (Object obj) {
     super(obj);
   }
 
-  public Project (
+  public Tenant (
     UUID id,
-    UUID idSchema,
-    String schemaName,
     String name,
     String description,
-    String domain,
-    String artifact,
+    String copyright,
+    String timeZone,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -48,12 +44,10 @@ public class Project extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idSchema = idSchema;
-    this.schemaName = schemaName;
     this.name = name;
     this.description = description;
-    this.domain = domain;
-    this.artifact = artifact;
+    this.copyright = copyright;
+    this.timeZone = timeZone;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -63,12 +57,10 @@ public class Project extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, Project.class);
+    var matchedParams = paramMatcher(queryParams, Tenant.class);
     matchedParams.put("sql", 
-      "SELECT pareto.project.*, " + 
-      "pareto.schema.name as schema_name " + 
-      "FROM pareto.project " + 
-      "JOIN pareto.schema on (pareto.schema.id = pareto.project.id_schema)");
+      "SELECT pareto.tenant.* " + 
+      "FROM pareto.tenant");
     return matchedParams;
   }
 
@@ -80,22 +72,6 @@ public class Project extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
-  }    
-    
-  public UUID getIdSchema() {
-    return this.idSchema;
-  }
-    
-  public UUID setIdSchema(UUID idSchema) {
-    return this.idSchema = idSchema;
-  }    
-    
-  public String getSchemaName() {
-    return this.schemaName;
-  }
-    
-  public String setSchemaName(String schemaName) {
-    return this.schemaName = schemaName;
   }    
     
   public String getName() {
@@ -114,20 +90,20 @@ public class Project extends BaseModel {
     return this.description = description;
   }    
     
-  public String getDomain() {
-    return this.domain;
+  public String getCopyright() {
+    return this.copyright;
   }
     
-  public String setDomain(String domain) {
-    return this.domain = domain;
+  public String setCopyright(String copyright) {
+    return this.copyright = copyright;
   }    
     
-  public String getArtifact() {
-    return this.artifact;
+  public String getTimeZone() {
+    return this.timeZone;
   }
     
-  public String setArtifact(String artifact) {
-    return this.artifact = artifact;
+  public String setTimeZone(String timeZone) {
+    return this.timeZone = timeZone;
   }    
     
   public Timestamp getCreatedAt() {

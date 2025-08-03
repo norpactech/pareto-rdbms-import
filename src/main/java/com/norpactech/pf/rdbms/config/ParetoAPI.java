@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.norpactech.pf.rdbms.api.model.Schema;
-import com.norpactech.pf.rdbms.api.model.Tenant;
 import com.norpactech.pf.rdbms.enums.EnumStatus;
+import com.norpactech.pf.rdbms.model.Schema;
+import com.norpactech.pf.rdbms.model.Tenant;
 import com.norpactech.pf.rdbms.repository.SchemaRepository;
 import com.norpactech.pf.rdbms.repository.TenantRepository;
 import com.norpactech.pf.rdbms.utils.ApiResponse;

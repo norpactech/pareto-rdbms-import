@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.DataObject;
 import com.norpactech.pf.rdbms.dto.DataObjectPostApiRequest;
 import com.norpactech.pf.rdbms.dto.DataObjectPutApiRequest;
+import com.norpactech.pf.rdbms.model.DataObject;
 import com.norpactech.pf.rdbms.utils.ApiResponse;
 
 public class DataObjectRepository extends ParetoApiRepository<DataObject> {

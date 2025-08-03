@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,38 +11,36 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: DataObject - Object
+ * API Model Class: Project - Pareto Project
  */
-public class DataObject extends BaseModel {
+public class Project extends BaseModel {
 
   private UUID id;
   private UUID idSchema;
   private String schemaName;
   private String name;
   private String description;
-  private Boolean hasIdentifier;
-  private Boolean hasAudit;
-  private Boolean hasActive;
+  private String domain;
+  private String artifact;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public DataObject () {}
-  public DataObject (Object obj) {
+  public Project () {}
+  public Project (Object obj) {
     super(obj);
   }
 
-  public DataObject (
+  public Project (
     UUID id,
     UUID idSchema,
     String schemaName,
     String name,
     String description,
-    Boolean hasIdentifier,
-    Boolean hasAudit,
-    Boolean hasActive,
+    String domain,
+    String artifact,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -54,9 +52,8 @@ public class DataObject extends BaseModel {
     this.schemaName = schemaName;
     this.name = name;
     this.description = description;
-    this.hasIdentifier = hasIdentifier;
-    this.hasAudit = hasAudit;
-    this.hasActive = hasActive;
+    this.domain = domain;
+    this.artifact = artifact;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -66,12 +63,12 @@ public class DataObject extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, DataObject.class);
+    var matchedParams = paramMatcher(queryParams, Project.class);
     matchedParams.put("sql", 
-      "SELECT pareto.data_object.*, " + 
+      "SELECT pareto.project.*, " + 
       "pareto.schema.name as schema_name " + 
-      "FROM pareto.data_object " + 
-      "JOIN pareto.schema on (pareto.schema.id = pareto.data_object.id_schema)");
+      "FROM pareto.project " + 
+      "JOIN pareto.schema on (pareto.schema.id = pareto.project.id_schema)");
     return matchedParams;
   }
 
@@ -117,28 +114,20 @@ public class DataObject extends BaseModel {
     return this.description = description;
   }    
     
-  public Boolean getHasIdentifier() {
-    return this.hasIdentifier;
+  public String getDomain() {
+    return this.domain;
   }
     
-  public Boolean setHasIdentifier(Boolean hasIdentifier) {
-    return this.hasIdentifier = hasIdentifier;
+  public String setDomain(String domain) {
+    return this.domain = domain;
   }    
     
-  public Boolean getHasAudit() {
-    return this.hasAudit;
+  public String getArtifact() {
+    return this.artifact;
   }
     
-  public Boolean setHasAudit(Boolean hasAudit) {
-    return this.hasAudit = hasAudit;
-  }    
-    
-  public Boolean getHasActive() {
-    return this.hasActive;
-  }
-    
-  public Boolean setHasActive(Boolean hasActive) {
-    return this.hasActive = hasActive;
+  public String setArtifact(String artifact) {
+    return this.artifact = artifact;
   }    
     
   public Timestamp getCreatedAt() {

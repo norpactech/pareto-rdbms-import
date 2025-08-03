@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;

@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -12,42 +12,36 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: ContextDataType - Data Types for a Context
+ * API Model Class: GenericDataType - Generic Data Types for a Logical Model
  */
-public class ContextDataType extends BaseModel {
+public class GenericDataType extends BaseModel {
 
   private UUID id;
-  private UUID idContext;
-  private String contextName;
-  private UUID idGenericDataType;
-  private String genericDataTypeName;
+  private UUID idTenant;
+  private String tenantName;
   private Integer sequence;
   private String name;
   private String description;
   private String alias;
-  private String contextValue;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public ContextDataType () {}
-  public ContextDataType (Object obj) {
+  public GenericDataType () {}
+  public GenericDataType (Object obj) {
     super(obj);
   }
 
-  public ContextDataType (
+  public GenericDataType (
     UUID id,
-    UUID idContext,
-    String contextName,
-    UUID idGenericDataType,
-    String genericDataTypeName,
+    UUID idTenant,
+    String tenantName,
     Integer sequence,
     String name,
     String description,
     String alias,
-    String contextValue,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -55,15 +49,12 @@ public class ContextDataType extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idContext = idContext;
-    this.contextName = contextName;
-    this.idGenericDataType = idGenericDataType;
-    this.genericDataTypeName = genericDataTypeName;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
     this.sequence = sequence;
     this.name = name;
     this.description = description;
     this.alias = alias;
-    this.contextValue = contextValue;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -73,14 +64,12 @@ public class ContextDataType extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, ContextDataType.class);
+    var matchedParams = paramMatcher(queryParams, GenericDataType.class);
     matchedParams.put("sql", 
-      "SELECT pareto.context_data_type.*, " + 
-      "pareto.context.name as context_name, " + 
-      "pareto.generic_data_type.name as generic_data_type_name " + 
-      "FROM pareto.context_data_type " + 
-      "JOIN pareto.context on (pareto.context.id = pareto.context_data_type.id_context) " + 
-      "JOIN pareto.generic_data_type on (pareto.generic_data_type.id = pareto.context_data_type.id_generic_data_type)");
+      "SELECT pareto.generic_data_type.*, " + 
+      "pareto.tenant.name as tenant_name " + 
+      "FROM pareto.generic_data_type " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.generic_data_type.id_tenant)");
     return matchedParams;
   }
 
@@ -94,36 +83,20 @@ public class ContextDataType extends BaseModel {
     return this.id = id;
   }    
     
-  public UUID getIdContext() {
-    return this.idContext;
+  public UUID getIdTenant() {
+    return this.idTenant;
   }
     
-  public UUID setIdContext(UUID idContext) {
-    return this.idContext = idContext;
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
   }    
     
-  public String getContextName() {
-    return this.contextName;
+  public String getTenantName() {
+    return this.tenantName;
   }
     
-  public String setContextName(String contextName) {
-    return this.contextName = contextName;
-  }    
-    
-  public UUID getIdGenericDataType() {
-    return this.idGenericDataType;
-  }
-    
-  public UUID setIdGenericDataType(UUID idGenericDataType) {
-    return this.idGenericDataType = idGenericDataType;
-  }    
-    
-  public String getGenericDataTypeName() {
-    return this.genericDataTypeName;
-  }
-    
-  public String setGenericDataTypeName(String genericDataTypeName) {
-    return this.genericDataTypeName = genericDataTypeName;
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
   public Integer getSequence() {
@@ -156,14 +129,6 @@ public class ContextDataType extends BaseModel {
     
   public String setAlias(String alias) {
     return this.alias = alias;
-  }    
-    
-  public String getContextValue() {
-    return this.contextValue;
-  }
-    
-  public String setContextValue(String contextValue) {
-    return this.contextValue = contextValue;
   }    
     
   public Timestamp getCreatedAt() {

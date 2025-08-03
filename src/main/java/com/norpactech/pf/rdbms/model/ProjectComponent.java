@@ -1,51 +1,52 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
  * For license details, see the LICENSE file in this project root.
  */
 import java.lang.Boolean;
-import java.lang.Integer;
 import java.lang.String;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: ContextPropertyType - Context Property Types
+ * API Model Class: ProjectComponent - Project Component (i.e. DDL)
  */
-public class ContextPropertyType extends BaseModel {
+public class ProjectComponent extends BaseModel {
 
   private UUID id;
+  private UUID idProject;
+  private String projectName;
   private UUID idContext;
   private String contextName;
-  private UUID idGenericPropertyType;
-  private String genericPropertyTypeName;
-  private Integer length;
-  private Integer scale;
-  private Boolean isNullable;
-  private String defaultValue;
+  private UUID idPlugin;
+  private String pluginName;
+  private String name;
+  private String description;
+  private String subPackage;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public ContextPropertyType () {}
-  public ContextPropertyType (Object obj) {
+  public ProjectComponent () {}
+  public ProjectComponent (Object obj) {
     super(obj);
   }
 
-  public ContextPropertyType (
+  public ProjectComponent (
     UUID id,
+    UUID idProject,
+    String projectName,
     UUID idContext,
     String contextName,
-    UUID idGenericPropertyType,
-    String genericPropertyTypeName,
-    Integer length,
-    Integer scale,
-    Boolean isNullable,
-    String defaultValue,
+    UUID idPlugin,
+    String pluginName,
+    String name,
+    String description,
+    String subPackage,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -53,14 +54,15 @@ public class ContextPropertyType extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
+    this.idProject = idProject;
+    this.projectName = projectName;
     this.idContext = idContext;
     this.contextName = contextName;
-    this.idGenericPropertyType = idGenericPropertyType;
-    this.genericPropertyTypeName = genericPropertyTypeName;
-    this.length = length;
-    this.scale = scale;
-    this.isNullable = isNullable;
-    this.defaultValue = defaultValue;
+    this.idPlugin = idPlugin;
+    this.pluginName = pluginName;
+    this.name = name;
+    this.description = description;
+    this.subPackage = subPackage;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -70,14 +72,16 @@ public class ContextPropertyType extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, ContextPropertyType.class);
+    var matchedParams = paramMatcher(queryParams, ProjectComponent.class);
     matchedParams.put("sql", 
-      "SELECT pareto.context_property_type.*, " + 
+      "SELECT pareto.project_component.*, " + 
+      "pareto.project.name as project_name, " + 
       "pareto.context.name as context_name, " + 
-      "pareto.generic_property_type.name as generic_property_type_name " + 
-      "FROM pareto.context_property_type " + 
-      "JOIN pareto.context on (pareto.context.id = pareto.context_property_type.id_context) " + 
-      "JOIN pareto.generic_property_type on (pareto.generic_property_type.id = pareto.context_property_type.id_generic_property_type)");
+      "pareto.plugin.name as plugin_name " + 
+      "FROM pareto.project_component " + 
+      "JOIN pareto.project on (pareto.project.id = pareto.project_component.id_project) " + 
+      "JOIN pareto.context on (pareto.context.id = pareto.project_component.id_context) " + 
+      "JOIN pareto.plugin on (pareto.plugin.id = pareto.project_component.id_plugin)");
     return matchedParams;
   }
 
@@ -89,6 +93,22 @@ public class ContextPropertyType extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
+  }    
+    
+  public UUID getIdProject() {
+    return this.idProject;
+  }
+    
+  public UUID setIdProject(UUID idProject) {
+    return this.idProject = idProject;
+  }    
+    
+  public String getProjectName() {
+    return this.projectName;
+  }
+    
+  public String setProjectName(String projectName) {
+    return this.projectName = projectName;
   }    
     
   public UUID getIdContext() {
@@ -107,52 +127,44 @@ public class ContextPropertyType extends BaseModel {
     return this.contextName = contextName;
   }    
     
-  public UUID getIdGenericPropertyType() {
-    return this.idGenericPropertyType;
+  public UUID getIdPlugin() {
+    return this.idPlugin;
   }
     
-  public UUID setIdGenericPropertyType(UUID idGenericPropertyType) {
-    return this.idGenericPropertyType = idGenericPropertyType;
+  public UUID setIdPlugin(UUID idPlugin) {
+    return this.idPlugin = idPlugin;
   }    
     
-  public String getGenericPropertyTypeName() {
-    return this.genericPropertyTypeName;
+  public String getPluginName() {
+    return this.pluginName;
   }
     
-  public String setGenericPropertyTypeName(String genericPropertyTypeName) {
-    return this.genericPropertyTypeName = genericPropertyTypeName;
+  public String setPluginName(String pluginName) {
+    return this.pluginName = pluginName;
   }    
     
-  public Integer getLength() {
-    return this.length;
+  public String getName() {
+    return this.name;
   }
     
-  public Integer setLength(Integer length) {
-    return this.length = length;
+  public String setName(String name) {
+    return this.name = name;
   }    
     
-  public Integer getScale() {
-    return this.scale;
+  public String getDescription() {
+    return this.description;
   }
     
-  public Integer setScale(Integer scale) {
-    return this.scale = scale;
+  public String setDescription(String description) {
+    return this.description = description;
   }    
     
-  public Boolean getIsNullable() {
-    return this.isNullable;
+  public String getSubPackage() {
+    return this.subPackage;
   }
     
-  public Boolean setIsNullable(Boolean isNullable) {
-    return this.isNullable = isNullable;
-  }    
-    
-  public String getDefaultValue() {
-    return this.defaultValue;
-  }
-    
-  public String setDefaultValue(String defaultValue) {
-    return this.defaultValue = defaultValue;
+  public String setSubPackage(String subPackage) {
+    return this.subPackage = subPackage;
   }    
     
   public Timestamp getCreatedAt() {

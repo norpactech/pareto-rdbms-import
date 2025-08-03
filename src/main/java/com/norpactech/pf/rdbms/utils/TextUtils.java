@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.norpactech.pf.rdbms.api.model.DataObject;
+import com.norpactech.pf.rdbms.model.DataObject;
 
 public class TextUtils {
 

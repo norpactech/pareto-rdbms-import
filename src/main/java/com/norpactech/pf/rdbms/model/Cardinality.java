@@ -1,47 +1,48 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
  * For license details, see the LICENSE file in this project root.
  */
 import java.lang.Boolean;
-import java.lang.Integer;
 import java.lang.String;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: DataIndexProperty - Object Index Properties
+ * API Model Class: Cardinality - Object Cardinality
  */
-public class DataIndexProperty extends BaseModel {
+public class Cardinality extends BaseModel {
 
   private UUID id;
-  private UUID idDataIndex;
-  private String dataIndexName;
   private UUID idProperty;
   private String propertyName;
-  private UUID idRtSortOrder;
-  private Integer sequence;
+  private UUID idDataObject;
+  private String dataObjectName;
+  private UUID idRtCardinality;
+  private UUID idRtCardinalityStrength;
+  private Boolean hasReferencialAction;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public DataIndexProperty () {}
-  public DataIndexProperty (Object obj) {
+  public Cardinality () {}
+  public Cardinality (Object obj) {
     super(obj);
   }
 
-  public DataIndexProperty (
+  public Cardinality (
     UUID id,
-    UUID idDataIndex,
-    String dataIndexName,
     UUID idProperty,
     String propertyName,
-    UUID idRtSortOrder,
-    Integer sequence,
+    UUID idDataObject,
+    String dataObjectName,
+    UUID idRtCardinality,
+    UUID idRtCardinalityStrength,
+    Boolean hasReferencialAction,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -49,12 +50,13 @@ public class DataIndexProperty extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idDataIndex = idDataIndex;
-    this.dataIndexName = dataIndexName;
     this.idProperty = idProperty;
     this.propertyName = propertyName;
-    this.idRtSortOrder = idRtSortOrder;
-    this.sequence = sequence;
+    this.idDataObject = idDataObject;
+    this.dataObjectName = dataObjectName;
+    this.idRtCardinality = idRtCardinality;
+    this.idRtCardinalityStrength = idRtCardinalityStrength;
+    this.hasReferencialAction = hasReferencialAction;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -64,14 +66,14 @@ public class DataIndexProperty extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, DataIndexProperty.class);
+    var matchedParams = paramMatcher(queryParams, Cardinality.class);
     matchedParams.put("sql", 
-      "SELECT pareto.data_index_property.*, " + 
-      "pareto.data_index.name as data_index_name, " + 
-      "pareto.property.name as property_name " + 
-      "FROM pareto.data_index_property " + 
-      "JOIN pareto.data_index on (pareto.data_index.id = pareto.data_index_property.id_data_index) " + 
-      "JOIN pareto.property on (pareto.property.id = pareto.data_index_property.id_property)");
+      "SELECT pareto.cardinality.*, " + 
+      "pareto.property.name as property_name, " + 
+      "pareto.data_object.name as data_object_name " + 
+      "FROM pareto.cardinality " + 
+      "JOIN pareto.property on (pareto.property.id = pareto.cardinality.id_property) " + 
+      "JOIN pareto.data_object on (pareto.data_object.id = pareto.cardinality.id_data_object)");
     return matchedParams;
   }
 
@@ -83,22 +85,6 @@ public class DataIndexProperty extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
-  }    
-    
-  public UUID getIdDataIndex() {
-    return this.idDataIndex;
-  }
-    
-  public UUID setIdDataIndex(UUID idDataIndex) {
-    return this.idDataIndex = idDataIndex;
-  }    
-    
-  public String getDataIndexName() {
-    return this.dataIndexName;
-  }
-    
-  public String setDataIndexName(String dataIndexName) {
-    return this.dataIndexName = dataIndexName;
   }    
     
   public UUID getIdProperty() {
@@ -117,20 +103,44 @@ public class DataIndexProperty extends BaseModel {
     return this.propertyName = propertyName;
   }    
     
-  public UUID getIdRtSortOrder() {
-    return this.idRtSortOrder;
+  public UUID getIdDataObject() {
+    return this.idDataObject;
   }
     
-  public UUID setIdRtSortOrder(UUID idRtSortOrder) {
-    return this.idRtSortOrder = idRtSortOrder;
+  public UUID setIdDataObject(UUID idDataObject) {
+    return this.idDataObject = idDataObject;
   }    
     
-  public Integer getSequence() {
-    return this.sequence;
+  public String getDataObjectName() {
+    return this.dataObjectName;
   }
     
-  public Integer setSequence(Integer sequence) {
-    return this.sequence = sequence;
+  public String setDataObjectName(String dataObjectName) {
+    return this.dataObjectName = dataObjectName;
+  }    
+    
+  public UUID getIdRtCardinality() {
+    return this.idRtCardinality;
+  }
+    
+  public UUID setIdRtCardinality(UUID idRtCardinality) {
+    return this.idRtCardinality = idRtCardinality;
+  }    
+    
+  public UUID getIdRtCardinalityStrength() {
+    return this.idRtCardinalityStrength;
+  }
+    
+  public UUID setIdRtCardinalityStrength(UUID idRtCardinalityStrength) {
+    return this.idRtCardinalityStrength = idRtCardinalityStrength;
+  }    
+    
+  public Boolean getHasReferencialAction() {
+    return this.hasReferencialAction;
+  }
+    
+  public Boolean setHasReferencialAction(Boolean hasReferencialAction) {
+    return this.hasReferencialAction = hasReferencialAction;
   }    
     
   public Timestamp getCreatedAt() {

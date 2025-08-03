@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.Schema;
+import com.norpactech.pf.rdbms.model.Schema;
 
 public class SchemaRepository extends ParetoApiRepository<Schema> {
 

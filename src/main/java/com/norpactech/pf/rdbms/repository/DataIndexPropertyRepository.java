@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.DataIndexProperty;
 import com.norpactech.pf.rdbms.dto.DataIndexPropertyPostApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPropertyPutApiRequest;
+import com.norpactech.pf.rdbms.model.DataIndexProperty;
 import com.norpactech.pf.rdbms.utils.ApiResponse;
 
 public class DataIndexPropertyRepository extends ParetoApiRepository<DataIndexProperty> {

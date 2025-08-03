@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,32 +11,32 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: RefTableType - Reference Table Types
+ * API Model Class: DataIndex - Object Indexes
  */
-public class RefTableType extends BaseModel {
+public class DataIndex extends BaseModel {
 
   private UUID id;
-  private UUID idTenant;
-  private String tenantName;
+  private UUID idDataObject;
+  private String dataObjectName;
+  private UUID idRtIndexType;
   private String name;
-  private String description;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public RefTableType () {}
-  public RefTableType (Object obj) {
+  public DataIndex () {}
+  public DataIndex (Object obj) {
     super(obj);
   }
 
-  public RefTableType (
+  public DataIndex (
     UUID id,
-    UUID idTenant,
-    String tenantName,
+    UUID idDataObject,
+    String dataObjectName,
+    UUID idRtIndexType,
     String name,
-    String description,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -44,10 +44,10 @@ public class RefTableType extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idTenant = idTenant;
-    this.tenantName = tenantName;
+    this.idDataObject = idDataObject;
+    this.dataObjectName = dataObjectName;
+    this.idRtIndexType = idRtIndexType;
     this.name = name;
-    this.description = description;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -57,12 +57,12 @@ public class RefTableType extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, RefTableType.class);
+    var matchedParams = paramMatcher(queryParams, DataIndex.class);
     matchedParams.put("sql", 
-      "SELECT pareto.ref_table_type.*, " + 
-      "pareto.tenant.name as tenant_name " + 
-      "FROM pareto.ref_table_type " + 
-      "JOIN pareto.tenant on (pareto.tenant.id = pareto.ref_table_type.id_tenant)");
+      "SELECT pareto.data_index.*, " + 
+      "pareto.data_object.name as data_object_name " + 
+      "FROM pareto.data_index " + 
+      "JOIN pareto.data_object on (pareto.data_object.id = pareto.data_index.id_data_object)");
     return matchedParams;
   }
 
@@ -76,20 +76,28 @@ public class RefTableType extends BaseModel {
     return this.id = id;
   }    
     
-  public UUID getIdTenant() {
-    return this.idTenant;
+  public UUID getIdDataObject() {
+    return this.idDataObject;
   }
     
-  public UUID setIdTenant(UUID idTenant) {
-    return this.idTenant = idTenant;
+  public UUID setIdDataObject(UUID idDataObject) {
+    return this.idDataObject = idDataObject;
   }    
     
-  public String getTenantName() {
-    return this.tenantName;
+  public String getDataObjectName() {
+    return this.dataObjectName;
   }
     
-  public String setTenantName(String tenantName) {
-    return this.tenantName = tenantName;
+  public String setDataObjectName(String dataObjectName) {
+    return this.dataObjectName = dataObjectName;
+  }    
+    
+  public UUID getIdRtIndexType() {
+    return this.idRtIndexType;
+  }
+    
+  public UUID setIdRtIndexType(UUID idRtIndexType) {
+    return this.idRtIndexType = idRtIndexType;
   }    
     
   public String getName() {
@@ -98,14 +106,6 @@ public class RefTableType extends BaseModel {
     
   public String setName(String name) {
     return this.name = name;
-  }    
-    
-  public String getDescription() {
-    return this.description;
-  }
-    
-  public String setDescription(String description) {
-    return this.description = description;
   }    
     
   public Timestamp getCreatedAt() {

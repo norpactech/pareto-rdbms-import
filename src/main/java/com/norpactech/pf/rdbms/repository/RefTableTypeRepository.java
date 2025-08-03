@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.norpactech.pf.rdbms.api.model.RefTableType;
+import com.norpactech.pf.rdbms.model.RefTableType;
 
 public class RefTableTypeRepository extends ParetoApiRepository<RefTableType> {
 

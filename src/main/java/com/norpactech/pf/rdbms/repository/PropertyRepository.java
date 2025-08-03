@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.Property;
 import com.norpactech.pf.rdbms.dto.PropertyPostApiRequest;
 import com.norpactech.pf.rdbms.dto.PropertyPutApiRequest;
+import com.norpactech.pf.rdbms.model.Property;
 import com.norpactech.pf.rdbms.utils.ApiResponse;
 
 public class PropertyRepository extends ParetoApiRepository<Property> {

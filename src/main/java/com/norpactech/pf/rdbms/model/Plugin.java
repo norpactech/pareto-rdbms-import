@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,42 +11,34 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: ProjectComponent - Project Component (i.e. DDL)
+ * API Model Class: Plugin - Registered Plugins
  */
-public class ProjectComponent extends BaseModel {
+public class Plugin extends BaseModel {
 
   private UUID id;
-  private UUID idProject;
-  private String projectName;
   private UUID idContext;
   private String contextName;
-  private UUID idPlugin;
-  private String pluginName;
   private String name;
   private String description;
-  private String subPackage;
+  private String pluginService;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public ProjectComponent () {}
-  public ProjectComponent (Object obj) {
+  public Plugin () {}
+  public Plugin (Object obj) {
     super(obj);
   }
 
-  public ProjectComponent (
+  public Plugin (
     UUID id,
-    UUID idProject,
-    String projectName,
     UUID idContext,
     String contextName,
-    UUID idPlugin,
-    String pluginName,
     String name,
     String description,
-    String subPackage,
+    String pluginService,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -54,15 +46,11 @@ public class ProjectComponent extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
-    this.idProject = idProject;
-    this.projectName = projectName;
     this.idContext = idContext;
     this.contextName = contextName;
-    this.idPlugin = idPlugin;
-    this.pluginName = pluginName;
     this.name = name;
     this.description = description;
-    this.subPackage = subPackage;
+    this.pluginService = pluginService;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -72,16 +60,12 @@ public class ProjectComponent extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, ProjectComponent.class);
+    var matchedParams = paramMatcher(queryParams, Plugin.class);
     matchedParams.put("sql", 
-      "SELECT pareto.project_component.*, " + 
-      "pareto.project.name as project_name, " + 
-      "pareto.context.name as context_name, " + 
-      "pareto.plugin.name as plugin_name " + 
-      "FROM pareto.project_component " + 
-      "JOIN pareto.project on (pareto.project.id = pareto.project_component.id_project) " + 
-      "JOIN pareto.context on (pareto.context.id = pareto.project_component.id_context) " + 
-      "JOIN pareto.plugin on (pareto.plugin.id = pareto.project_component.id_plugin)");
+      "SELECT pareto.plugin.*, " + 
+      "pareto.context.name as context_name " + 
+      "FROM pareto.plugin " + 
+      "JOIN pareto.context on (pareto.context.id = pareto.plugin.id_context)");
     return matchedParams;
   }
 
@@ -93,22 +77,6 @@ public class ProjectComponent extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
-  }    
-    
-  public UUID getIdProject() {
-    return this.idProject;
-  }
-    
-  public UUID setIdProject(UUID idProject) {
-    return this.idProject = idProject;
-  }    
-    
-  public String getProjectName() {
-    return this.projectName;
-  }
-    
-  public String setProjectName(String projectName) {
-    return this.projectName = projectName;
   }    
     
   public UUID getIdContext() {
@@ -127,22 +95,6 @@ public class ProjectComponent extends BaseModel {
     return this.contextName = contextName;
   }    
     
-  public UUID getIdPlugin() {
-    return this.idPlugin;
-  }
-    
-  public UUID setIdPlugin(UUID idPlugin) {
-    return this.idPlugin = idPlugin;
-  }    
-    
-  public String getPluginName() {
-    return this.pluginName;
-  }
-    
-  public String setPluginName(String pluginName) {
-    return this.pluginName = pluginName;
-  }    
-    
   public String getName() {
     return this.name;
   }
@@ -159,12 +111,12 @@ public class ProjectComponent extends BaseModel {
     return this.description = description;
   }    
     
-  public String getSubPackage() {
-    return this.subPackage;
+  public String getPluginService() {
+    return this.pluginService;
   }
     
-  public String setSubPackage(String subPackage) {
-    return this.subPackage = subPackage;
+  public String setPluginService(String pluginService) {
+    return this.pluginService = pluginService;
   }    
     
   public Timestamp getCreatedAt() {

@@ -1,44 +1,53 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
  * For license details, see the LICENSE file in this project root.
  */
 import java.lang.Boolean;
+import java.lang.Integer;
 import java.lang.String;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: Plugin - Registered Plugins
+ * API Model Class: ContextDataType - Data Types for a Context
  */
-public class Plugin extends BaseModel {
+public class ContextDataType extends BaseModel {
 
   private UUID id;
   private UUID idContext;
   private String contextName;
+  private UUID idGenericDataType;
+  private String genericDataTypeName;
+  private Integer sequence;
   private String name;
   private String description;
-  private String pluginService;
+  private String alias;
+  private String contextValue;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
   private String updatedBy;
   private Boolean isActive;
 
-  public Plugin () {}
-  public Plugin (Object obj) {
+  public ContextDataType () {}
+  public ContextDataType (Object obj) {
     super(obj);
   }
 
-  public Plugin (
+  public ContextDataType (
     UUID id,
     UUID idContext,
     String contextName,
+    UUID idGenericDataType,
+    String genericDataTypeName,
+    Integer sequence,
     String name,
     String description,
-    String pluginService,
+    String alias,
+    String contextValue,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -48,9 +57,13 @@ public class Plugin extends BaseModel {
     this.id = id;
     this.idContext = idContext;
     this.contextName = contextName;
+    this.idGenericDataType = idGenericDataType;
+    this.genericDataTypeName = genericDataTypeName;
+    this.sequence = sequence;
     this.name = name;
     this.description = description;
-    this.pluginService = pluginService;
+    this.alias = alias;
+    this.contextValue = contextValue;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -60,12 +73,14 @@ public class Plugin extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, Plugin.class);
+    var matchedParams = paramMatcher(queryParams, ContextDataType.class);
     matchedParams.put("sql", 
-      "SELECT pareto.plugin.*, " + 
-      "pareto.context.name as context_name " + 
-      "FROM pareto.plugin " + 
-      "JOIN pareto.context on (pareto.context.id = pareto.plugin.id_context)");
+      "SELECT pareto.context_data_type.*, " + 
+      "pareto.context.name as context_name, " + 
+      "pareto.generic_data_type.name as generic_data_type_name " + 
+      "FROM pareto.context_data_type " + 
+      "JOIN pareto.context on (pareto.context.id = pareto.context_data_type.id_context) " + 
+      "JOIN pareto.generic_data_type on (pareto.generic_data_type.id = pareto.context_data_type.id_generic_data_type)");
     return matchedParams;
   }
 
@@ -95,6 +110,30 @@ public class Plugin extends BaseModel {
     return this.contextName = contextName;
   }    
     
+  public UUID getIdGenericDataType() {
+    return this.idGenericDataType;
+  }
+    
+  public UUID setIdGenericDataType(UUID idGenericDataType) {
+    return this.idGenericDataType = idGenericDataType;
+  }    
+    
+  public String getGenericDataTypeName() {
+    return this.genericDataTypeName;
+  }
+    
+  public String setGenericDataTypeName(String genericDataTypeName) {
+    return this.genericDataTypeName = genericDataTypeName;
+  }    
+    
+  public Integer getSequence() {
+    return this.sequence;
+  }
+    
+  public Integer setSequence(Integer sequence) {
+    return this.sequence = sequence;
+  }    
+    
   public String getName() {
     return this.name;
   }
@@ -111,12 +150,20 @@ public class Plugin extends BaseModel {
     return this.description = description;
   }    
     
-  public String getPluginService() {
-    return this.pluginService;
+  public String getAlias() {
+    return this.alias;
   }
     
-  public String setPluginService(String pluginService) {
-    return this.pluginService = pluginService;
+  public String setAlias(String alias) {
+    return this.alias = alias;
+  }    
+    
+  public String getContextValue() {
+    return this.contextValue;
+  }
+    
+  public String setContextValue(String contextValue) {
+    return this.contextValue = contextValue;
   }    
     
   public Timestamp getCreatedAt() {

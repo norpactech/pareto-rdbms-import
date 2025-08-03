@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.GenericPropertyType;
+import com.norpactech.pf.rdbms.model.GenericPropertyType;
 
 public class GenericPropertyTypeRepository extends ParetoApiRepository<GenericPropertyType> {
   

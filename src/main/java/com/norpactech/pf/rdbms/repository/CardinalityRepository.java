@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.norpactech.pf.rdbms.api.model.Cardinality;
 import com.norpactech.pf.rdbms.dto.CardinalityPostApiRequest;
 import com.norpactech.pf.rdbms.dto.CardinalityPutApiRequest;
+import com.norpactech.pf.rdbms.model.Cardinality;
 import com.norpactech.pf.rdbms.utils.ApiResponse;
 
 public class CardinalityRepository extends ParetoApiRepository<Cardinality> {

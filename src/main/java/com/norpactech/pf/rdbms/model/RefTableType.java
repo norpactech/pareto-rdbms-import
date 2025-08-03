@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.api.model;
+package com.norpactech.pf.rdbms.model;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * API Model Class: Context - Platform Context (pgsql, java)
+ * API Model Class: RefTableType - Reference Table Types
  */
-public class Context extends BaseModel {
+public class RefTableType extends BaseModel {
 
   private UUID id;
+  private UUID idTenant;
+  private String tenantName;
   private String name;
   private String description;
   private Timestamp createdAt;
@@ -24,13 +26,15 @@ public class Context extends BaseModel {
   private String updatedBy;
   private Boolean isActive;
 
-  public Context () {}
-  public Context (Object obj) {
+  public RefTableType () {}
+  public RefTableType (Object obj) {
     super(obj);
   }
 
-  public Context (
+  public RefTableType (
     UUID id,
+    UUID idTenant,
+    String tenantName,
     String name,
     String description,
     Timestamp createdAt,
@@ -40,6 +44,8 @@ public class Context extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
     this.name = name;
     this.description = description;
     this.createdAt = createdAt;
@@ -51,10 +57,12 @@ public class Context extends BaseModel {
 
   public static Map<String, Object> queryRequest(Map<String, String> queryParams) throws Exception {
     
-    var matchedParams = paramMatcher(queryParams, Context.class);
+    var matchedParams = paramMatcher(queryParams, RefTableType.class);
     matchedParams.put("sql", 
-      "SELECT pareto.context.* " + 
-      "FROM pareto.context");
+      "SELECT pareto.ref_table_type.*, " + 
+      "pareto.tenant.name as tenant_name " + 
+      "FROM pareto.ref_table_type " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.ref_table_type.id_tenant)");
     return matchedParams;
   }
 
@@ -66,6 +74,22 @@ public class Context extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
+  }    
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
+    
+  public String getTenantName() {
+    return this.tenantName;
+  }
+    
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
   public String getName() {
