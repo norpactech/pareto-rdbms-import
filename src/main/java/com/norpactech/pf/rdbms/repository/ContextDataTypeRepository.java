@@ -1,5 +1,9 @@
 package com.norpactech.pf.rdbms.repository;
-
+/**
+ * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
+ *  
+ * For license details, see the LICENSE file in this project root.
+ */
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

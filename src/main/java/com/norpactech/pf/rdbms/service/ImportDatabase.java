@@ -1,5 +1,9 @@
 package com.norpactech.pf.rdbms.service;
-
+/**
+ * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
+ *  
+ * For license details, see the LICENSE file in this project root.
+ */
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -81,7 +85,7 @@ public class ImportDatabase {
   private static final DataIndexRepository dataIndexRepository = new DataIndexRepository();
   private static final DataIndexPropertyRepository dataIndexPropertyRepository = new DataIndexPropertyRepository();
   
-  public static void importDatabase(String context, String username, String password, String dbSchema) throws Exception {
+  public static void importDatabase(String username, String password, String dbSchema) throws Exception {
     
     logger.info("Import Database Beginning with Schema: " + ParetoAPI.schema);
 

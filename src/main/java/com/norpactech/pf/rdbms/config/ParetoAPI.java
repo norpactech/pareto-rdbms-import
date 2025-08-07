@@ -1,5 +1,9 @@
 package com.norpactech.pf.rdbms.config;
-
+/**
+ * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
+ *  
+ * For license details, see the LICENSE file in this project root.
+ */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +34,6 @@ public class ParetoAPI {
   public static void configure(
       String thatHost, 
       String thatApiVersion, 
-      String tokenUrl, 
       String tenantName, 
       String schemaName, 
       String username, 
@@ -62,7 +65,7 @@ public class ParetoAPI {
     logger.info("Pareto API Health Status: {}", status);
     
     JwtRequestVO jwtRequest = new JwtRequestVO(username, password);
-    jwt = AuthUtils.getJwt(host + "/" + tokenUrl, jwtRequest);
+    jwt = AuthUtils.getJwt(host + "/access-token", jwtRequest);
     logger.info("User '{}' Signed In", jwtRequest.getEmail());
     
     tenant = new TenantRepository().findOne(tenantName);
