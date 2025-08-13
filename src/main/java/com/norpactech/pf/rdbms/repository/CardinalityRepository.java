@@ -5,17 +5,18 @@ package com.norpactech.pf.rdbms.repository;
  * For license details, see the LICENSE file in this project root.
  */
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
-
+import com.norpactech.pf.utils.ApiResponse;
 import com.norpactech.pf.rdbms.dto.CardinalityPostApiRequest;
+import com.norpactech.pf.rdbms.dto.CardinalityDeleteApiRequest;
 import com.norpactech.pf.rdbms.dto.CardinalityPutApiRequest;
+
 import com.norpactech.pf.rdbms.model.Cardinality;
-import com.norpactech.pf.rdbms.utils.ApiResponse;
 
-public class CardinalityRepository extends ParetoApiRepository<Cardinality> {
-
+public class CardinalityRepository extends ParetoNativeRepository<Cardinality> {
+  
   private static final String RELATIVE_URL = "/cardinality";
 
   @Override
@@ -23,30 +24,27 @@ public class CardinalityRepository extends ParetoApiRepository<Cardinality> {
     return RELATIVE_URL;
   }
 
-  public Cardinality findOne(UUID idDataObject, UUID idProperty) throws Exception {
-    
-    return findOne(Cardinality.class, new HashMap<>(Map.of("idDataObject", idDataObject.toString(), "idProperty", idProperty.toString())));
-  } 
+  public Cardinality get(UUID id) throws Exception {
+    return super.findOne(Cardinality.class, new HashMap<>(Map.of("id", id)));
+  }
+
+  public Cardinality findOne(UUID idProperty, UUID idDataObject) throws Exception {
+    return super.findOne(Cardinality.class, new HashMap<>(Map.of("idProperty", idProperty, "idDataObject", idDataObject)));
+  }
   
-  public List<Cardinality> findAll(UUID idDataObject) throws Exception {
-    return find(Cardinality.class, new HashMap<>(Map.of("idDataObject", idDataObject.toString())));
-  }   
-  
-  public void save(CardinalityPostApiRequest request) throws Exception {
+  public List<Cardinality> find(Map<String, Object> params) throws Exception {
+    return super.find(Cardinality.class, params);
+  }
     
-    ApiResponse response = post(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Cardinality was not saved! Terminating...");
-    }
+  public ApiResponse save(CardinalityPostApiRequest request) throws Exception {
+    return super.post(toParams(request));
   }  
   
-  public void save(CardinalityPutApiRequest request) throws Exception {
-    
-    ApiResponse response = put(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Cardinality was not saved! Terminating...");
-    }
-  }    
+  public ApiResponse save(CardinalityPutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(CardinalityDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
+  }
 }

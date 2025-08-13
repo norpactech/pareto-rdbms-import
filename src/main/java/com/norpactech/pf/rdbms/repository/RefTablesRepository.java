@@ -6,12 +6,17 @@ package com.norpactech.pf.rdbms.repository;
  */
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
+import com.norpactech.pf.utils.ApiResponse;
+import com.norpactech.pf.rdbms.dto.RefTablesDeleteApiRequest;
+import com.norpactech.pf.rdbms.dto.RefTablesPostApiRequest;
+import com.norpactech.pf.rdbms.dto.RefTablesPutApiRequest;
 
 import com.norpactech.pf.rdbms.model.RefTables;
 
-public class RefTablesRepository extends ParetoApiRepository<RefTables> {
-
+public class RefTablesRepository extends ParetoNativeRepository<RefTables> {
+  
   private static final String RELATIVE_URL = "/ref-tables";
 
   @Override
@@ -19,7 +24,27 @@ public class RefTablesRepository extends ParetoApiRepository<RefTables> {
     return RELATIVE_URL;
   }
 
+  public RefTables get(UUID id) throws Exception {
+    return super.findOne(RefTables.class, new HashMap<>(Map.of("id", id)));
+  }
+
   public RefTables findOne(UUID idRefTableType, String name) throws Exception {
-    return findOne(RefTables.class, new HashMap<>(Map.of("idRefTableType", idRefTableType.toString(), "name", name)));
+    return super.findOne(RefTables.class, new HashMap<>(Map.of("idRefTableType", idRefTableType, "name", name)));
+  }
+  
+  public List<RefTables> find(Map<String, Object> params) throws Exception {
+    return super.find(RefTables.class, params);
+  }
+    
+  public ApiResponse save(RefTablesPostApiRequest request) throws Exception {
+    return super.post(toParams(request));
+  }  
+  
+  public ApiResponse save(RefTablesPutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(RefTablesDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
   }
 }

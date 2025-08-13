@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.config;
+package com.norpactech.pf.config;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -14,10 +14,10 @@ import com.norpactech.pf.rdbms.model.Schema;
 import com.norpactech.pf.rdbms.model.Tenant;
 import com.norpactech.pf.rdbms.repository.SchemaRepository;
 import com.norpactech.pf.rdbms.repository.TenantRepository;
-import com.norpactech.pf.rdbms.utils.ApiResponse;
-import com.norpactech.pf.rdbms.utils.AuthUtils;
-import com.norpactech.pf.rdbms.utils.NetUtils;
 import com.norpactech.pf.rdbms.vo.JwtRequestVO;
+import com.norpactech.pf.utils.ApiResponse;
+import com.norpactech.pf.utils.AuthUtils;
+import com.norpactech.pf.utils.NetUtils;
 
 public class ParetoAPI {
 

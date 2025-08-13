@@ -5,17 +5,18 @@ package com.norpactech.pf.rdbms.repository;
  * For license details, see the LICENSE file in this project root.
  */
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
-
+import com.norpactech.pf.utils.ApiResponse;
 import com.norpactech.pf.rdbms.dto.DataIndexPostApiRequest;
+import com.norpactech.pf.rdbms.dto.DataIndexDeleteApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPutApiRequest;
+
 import com.norpactech.pf.rdbms.model.DataIndex;
-import com.norpactech.pf.rdbms.utils.ApiResponse;
 
-public class DataIndexRepository extends ParetoApiRepository<DataIndex> {
-
+public class DataIndexRepository extends ParetoNativeRepository<DataIndex> {
+  
   private static final String RELATIVE_URL = "/data-index";
 
   @Override
@@ -23,30 +24,27 @@ public class DataIndexRepository extends ParetoApiRepository<DataIndex> {
     return RELATIVE_URL;
   }
 
+  public DataIndex get(UUID id) throws Exception {
+    return super.findOne(DataIndex.class, new HashMap<>(Map.of("id", id)));
+  }
+
   public DataIndex findOne(UUID idDataObject, String name) throws Exception {
-    
-    return findOne(DataIndex.class, new HashMap<>(Map.of("idDataObject", idDataObject.toString(), "name", name)));
-  } 
+    return super.findOne(DataIndex.class, new HashMap<>(Map.of("idDataObject", idDataObject, "name", name)));
+  }
   
-  public List<DataIndex> findAll(UUID idDataObject) throws Exception {
-    return find(DataIndex.class, new HashMap<>(Map.of("idDataObject", idDataObject.toString())));
-  }   
-  
-  public void save(DataIndexPostApiRequest request) throws Exception {
+  public List<DataIndex> find(Map<String, Object> params) throws Exception {
+    return super.find(DataIndex.class, params);
+  }
     
-    ApiResponse response = post(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Data Index was not saved! Terminating...");
-    }
+  public ApiResponse save(DataIndexPostApiRequest request) throws Exception {
+    return super.post(toParams(request));
   }  
   
-  public void save(DataIndexPutApiRequest request) throws Exception {
-    
-    ApiResponse response = put(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Data Index was not saved! Terminating...");
-    }
-  }    
+  public ApiResponse save(DataIndexPutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(DataIndexDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
+  }
 }

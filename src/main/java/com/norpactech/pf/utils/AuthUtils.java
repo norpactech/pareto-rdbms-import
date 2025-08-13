@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.utils;
+package com.norpactech.pf.utils;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.norpactech.pf.rdbms.config.Datasource;
+import com.norpactech.pf.config.Datasource;
 import com.norpactech.pf.rdbms.enums.EnumStatus;
 import com.norpactech.pf.rdbms.vo.JwtRequestVO;
 

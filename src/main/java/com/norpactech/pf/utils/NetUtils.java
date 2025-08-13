@@ -1,4 +1,4 @@
-package com.norpactech.pf.rdbms.utils;
+package com.norpactech.pf.utils;
 /**
  * © 2025 Northern Pacific Technologies, LLC. All Rights Reserved. 
  *  
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.norpactech.pf.rdbms.config.ParetoAPI;
+import com.norpactech.pf.config.ParetoAPI;
 
 import okhttp3.OkHttpClient;
 

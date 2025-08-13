@@ -5,17 +5,18 @@ package com.norpactech.pf.rdbms.repository;
  * For license details, see the LICENSE file in this project root.
  */
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
-
-import com.norpactech.pf.rdbms.dto.PropertyPostApiRequest;
+import com.norpactech.pf.utils.ApiResponse;
 import com.norpactech.pf.rdbms.dto.PropertyPutApiRequest;
+import com.norpactech.pf.rdbms.dto.PropertyDeleteApiRequest;
+import com.norpactech.pf.rdbms.dto.PropertyPostApiRequest;
+
 import com.norpactech.pf.rdbms.model.Property;
-import com.norpactech.pf.rdbms.utils.ApiResponse;
 
-public class PropertyRepository extends ParetoApiRepository<Property> {
-
+public class PropertyRepository extends ParetoNativeRepository<Property> {
+  
   private static final String RELATIVE_URL = "/property";
 
   @Override
@@ -23,29 +24,27 @@ public class PropertyRepository extends ParetoApiRepository<Property> {
     return RELATIVE_URL;
   }
 
+  public Property get(UUID id) throws Exception {
+    return super.findOne(Property.class, new HashMap<>(Map.of("id", id)));
+  }
+
   public Property findOne(UUID idDataObject, String name) throws Exception {
-    return findOne(Property.class, new HashMap<>(Map.of("idDataObject", idDataObject.toString(), "name", name)));
-  } 
+    return super.findOne(Property.class, new HashMap<>(Map.of("idDataObject", idDataObject, "name", name)));
+  }
   
-  public List<Property> findAll(UUID idDataObject) throws Exception {
-    return find(Property.class, new HashMap<>(Map.of("idSchema", idDataObject.toString())));
-  }   
-  
-  public void save(PropertyPostApiRequest request) throws Exception {
+  public List<Property> find(Map<String, Object> params) throws Exception {
+    return super.find(Property.class, params);
+  }
     
-    ApiResponse response = post(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Property '" + request.getName() + "' was not saved! Terminating...");
-    }
+  public ApiResponse save(PropertyPostApiRequest request) throws Exception {
+    return super.post(toParams(request));
   }  
   
-  public void save(PropertyPutApiRequest request) throws Exception {
-    
-    ApiResponse response = put(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Property '" + request.getName() + "' was not saved! Terminating...");
-    }
-  }    
+  public ApiResponse save(PropertyPutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(PropertyDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
+  }
 }

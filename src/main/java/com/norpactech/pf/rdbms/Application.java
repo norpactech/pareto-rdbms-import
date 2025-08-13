@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.norpactech.pf.rdbms.config.Datasource;
-import com.norpactech.pf.rdbms.config.ParetoAPI;
+import com.norpactech.pf.config.Datasource;
+import com.norpactech.pf.config.ParetoAPI;
 import com.norpactech.pf.rdbms.service.ImportDatabase;
 
 public class Application {
@@ -29,6 +29,15 @@ public class Application {
     String dbUsername = System.getenv("DB_USERNAME");
     String dbPassword = System.getenv("DB_PASSWORD");
     
+    username = "scott@norpactech.com";
+    password = "G00seEgg!";
+    factoryURL = "http://localhost:8087";
+    apiVersion = "v01";
+    tenant = "norpac";
+    schema = "united-bins";
+    dbUsername = "root";
+    dbPassword = "password";
+        
     logger.info("Beginning Pareto Build");
 
     if (StringUtils.isEmpty(username)) {

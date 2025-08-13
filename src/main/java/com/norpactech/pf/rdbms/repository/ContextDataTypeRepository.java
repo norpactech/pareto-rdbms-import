@@ -5,17 +5,18 @@ package com.norpactech.pf.rdbms.repository;
  * For license details, see the LICENSE file in this project root.
  */
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
-
-import com.norpactech.pf.rdbms.dto.ContextDataTypePostApiRequest;
+import com.norpactech.pf.utils.ApiResponse;
+import com.norpactech.pf.rdbms.dto.ContextDataTypeDeleteApiRequest;
 import com.norpactech.pf.rdbms.dto.ContextDataTypePutApiRequest;
+import com.norpactech.pf.rdbms.dto.ContextDataTypePostApiRequest;
+
 import com.norpactech.pf.rdbms.model.ContextDataType;
-import com.norpactech.pf.rdbms.utils.ApiResponse;
 
-public class ContextDataTypeRepository extends ParetoApiRepository<ContextDataType> {
-
+public class ContextDataTypeRepository extends ParetoNativeRepository<ContextDataType> {
+  
   private static final String RELATIVE_URL = "/context-data-type";
 
   @Override
@@ -23,29 +24,27 @@ public class ContextDataTypeRepository extends ParetoApiRepository<ContextDataTy
     return RELATIVE_URL;
   }
 
-  public ContextDataType findOne(UUID idContext, String name) throws Exception {
-    return findOne(ContextDataType.class, new HashMap<>(Map.of("idContext", idContext.toString(), "contextValue", name)));
-  } 
+  public ContextDataType get(UUID id) throws Exception {
+    return super.findOne(ContextDataType.class, new HashMap<>(Map.of("id", id)));
+  }
+
+  public ContextDataType findOne(UUID idContext, UUID idGenericDataType) throws Exception {
+    return super.findOne(ContextDataType.class, new HashMap<>(Map.of("idContext", idContext, "idGenericDataType", idGenericDataType)));
+  }
   
-  public List<ContextDataType> findAll(UUID idContext) throws Exception {
-    return find(ContextDataType.class, new HashMap<>(Map.of("idContext", idContext.toString())));
-  }   
-  
-  public void save(ContextDataTypePostApiRequest request) throws Exception {
+  public List<ContextDataType> find(Map<String, Object> params) throws Exception {
+    return super.find(ContextDataType.class, params);
+  }
     
-    ApiResponse response = post(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Context Data TYpe '" + request.getName() + "' was not saved! Terminating...");
-    }
+  public ApiResponse save(ContextDataTypePostApiRequest request) throws Exception {
+    return super.post(toParams(request));
   }  
   
-  public void save(ContextDataTypePutApiRequest request) throws Exception {
-    
-    ApiResponse response = put(toParams(request));
-    
-    if (response.getData() == null) {
-      throw new Exception("Context Data Type '" + request.getName() + "' was not saved! Terminating...");
-    }
+  public ApiResponse save(ContextDataTypePutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(ContextDataTypeDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
   }
 }

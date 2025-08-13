@@ -5,13 +5,18 @@ package com.norpactech.pf.rdbms.repository;
  * For license details, see the LICENSE file in this project root.
  */
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.UUID;
+import com.norpactech.pf.utils.ApiResponse;
+import com.norpactech.pf.rdbms.dto.RefTableTypePutApiRequest;
+import com.norpactech.pf.rdbms.dto.RefTableTypePostApiRequest;
+import com.norpactech.pf.rdbms.dto.RefTableTypeDeleteApiRequest;
 
 import com.norpactech.pf.rdbms.model.RefTableType;
 
-public class RefTableTypeRepository extends ParetoApiRepository<RefTableType> {
-
+public class RefTableTypeRepository extends ParetoNativeRepository<RefTableType> {
+  
   private static final String RELATIVE_URL = "/ref-table-type";
 
   @Override
@@ -19,11 +24,27 @@ public class RefTableTypeRepository extends ParetoApiRepository<RefTableType> {
     return RELATIVE_URL;
   }
 
-  public RefTableType findOne(String name) throws Exception {
-    return findOne(RefTableType.class, new HashMap<>(Map.of("name", name)));
-  } 
+  public RefTableType get(UUID id) throws Exception {
+    return super.findOne(RefTableType.class, new HashMap<>(Map.of("id", id)));
+  }
+
+  public RefTableType findOne(UUID idTenant, String name) throws Exception {
+    return super.findOne(RefTableType.class, new HashMap<>(Map.of("idTenant", idTenant, "name", name)));
+  }
   
-  public List<RefTableType> findAll() throws Exception {
-    return find(RefTableType.class, new HashMap<>());
-  }    
+  public List<RefTableType> find(Map<String, Object> params) throws Exception {
+    return super.find(RefTableType.class, params);
+  }
+    
+  public ApiResponse save(RefTableTypePostApiRequest request) throws Exception {
+    return super.post(toParams(request));
+  }  
+  
+  public ApiResponse save(RefTableTypePutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(RefTableTypeDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
+  }
 }

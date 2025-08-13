@@ -7,14 +7,17 @@ package com.norpactech.pf.rdbms.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.norpactech.pf.rdbms.config.ParetoAPI;
+import com.norpactech.pf.config.ParetoAPI;
 import com.norpactech.pf.rdbms.dto.CardinalityPostApiRequest;
 import com.norpactech.pf.rdbms.dto.CardinalityPutApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPostApiRequest;
@@ -35,6 +38,7 @@ import com.norpactech.pf.rdbms.model.GenericPropertyType;
 import com.norpactech.pf.rdbms.model.Property;
 import com.norpactech.pf.rdbms.model.RefTableType;
 import com.norpactech.pf.rdbms.model.RefTables;
+import com.norpactech.pf.rdbms.model.Tenant;
 import com.norpactech.pf.rdbms.model.Validation;
 import com.norpactech.pf.rdbms.repository.CardinalityRepository;
 import com.norpactech.pf.rdbms.repository.ContextDataTypeRepository;
@@ -47,9 +51,9 @@ import com.norpactech.pf.rdbms.repository.PropertyRepository;
 import com.norpactech.pf.rdbms.repository.RefTableTypeRepository;
 import com.norpactech.pf.rdbms.repository.RefTablesRepository;
 import com.norpactech.pf.rdbms.repository.ValidationRepository;
-import com.norpactech.pf.rdbms.utils.Constant;
-import com.norpactech.pf.rdbms.utils.TextUtils;
 import com.norpactech.pf.rdbms.vo.ForeignKeyVO;
+import com.norpactech.pf.utils.Constant;
+import com.norpactech.pf.utils.TextUtils;
 
 import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
@@ -120,8 +124,8 @@ public class ImportDatabase {
     }
     Collection<Table> tables = catalog.getTables(catalogSchema);
     importTables(tables, paretoContext);    
-    importCardinality(tables);    
-    importIndexes(tables);    
+    importCardinality(ParetoAPI.tenant, tables);    
+    importIndexes(ParetoAPI.tenant, tables);    
     logger.info("Import Database Completed with Schema: " + ParetoAPI.schema);
   }
 
@@ -190,17 +194,15 @@ public class ImportDatabase {
     }
   }
 
-  private static void importProperties(Context paretoContext, Table table) throws Exception {
+  private static void importProperties(Context context, Table table) throws Exception {
     
     DataObject dataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), table.getName());
+    List<ContextDataType> contextDataTypes = contextDataTypeRepository.find(Map.of("idContext", context.getId()));
 
     int i = 1;
     for (final Column column : table.getColumns()) {
-      // Context Data Type
-      ContextDataType contextDataType = contextDataTypeRepository.findOne(paretoContext.getId(), column.getType().getJavaSqlType().getName().toLowerCase());
-      if (contextDataType == null) {
-        throw new Exception("Unsupported Context Data Type! '" + column.getType().getJavaSqlType().getName() + "' Terminating...");
-      }
+
+      var contextDataType = getContextDataType(contextDataTypes, table, column);
       UUID idGenericDataType = contextDataType.getIdGenericDataType();
       // Validation
       Validation validation = validationRepository.findOne(ParetoAPI.tenant.getId(), column.getName());
@@ -259,9 +261,35 @@ public class ImportDatabase {
     }
   }
 
-  private static void importCardinality(Collection<Table> tables) throws Exception {
+  private static ContextDataType getContextDataType(
+      List<ContextDataType> contextDataTypes, 
+      Table table, 
+      Column column) throws Exception {
+    
+    String columnDataType = column.getColumnDataType().getName();
+    if (StringUtils.isNotEmpty(column.getWidth())) {
+      /*
+       *  TODO: Char(36) is a special data type for UUIDs. This needs to 
+       *  be a documented anomaly. Doubtful if someone would use char(36)
+       *  otherwise.  
+       */
+      if (columnDataType.equalsIgnoreCase("char")
+      &&  column.getWidth().equalsIgnoreCase("(36)")) { 
+        columnDataType += column.getWidth();
+      }
+    }
+    
+    for (ContextDataType contextDataType : contextDataTypes) {
+      if (columnDataType.equalsIgnoreCase(contextDataType.getName())) {
+        return contextDataType;
+      }
+    }
+    throw new Exception("Unsupported Context Data Type! '" + columnDataType + ", " + table.getName() + " - " + column.getName() + "' Terminating...");
+  }
+  
+  private static void importCardinality(Tenant tenant, Collection<Table> tables) throws Exception {
 
-    RefTableType cardinalityTT = refTableTypeRepository.findOne(Constant.CARDINALITY_TABLE_TYPE);
+    RefTableType cardinalityTT = refTableTypeRepository.findOne(tenant.getId(), Constant.CARDINALITY_TABLE_TYPE);
     if (cardinalityTT == null) {
       throw new Exception ("Cardinality Table Type not found! Terminating...");
     }
@@ -269,7 +297,7 @@ public class ImportDatabase {
     if (oneToMany == null) {
       throw new Exception ("M:1 Cardinality not found! Terminating...");
     }
-    RefTableType cardinalityStrengthTT = refTableTypeRepository.findOne(Constant.CARDINALITY_STRENGTH_TABLE_TYPE); 
+    RefTableType cardinalityStrengthTT = refTableTypeRepository.findOne(tenant.getId(), Constant.CARDINALITY_STRENGTH_TABLE_TYPE); 
     if (cardinalityStrengthTT == null) {
       throw new Exception ("Cardinality Strength Table Type not found! Terminating...");
     }
@@ -352,16 +380,16 @@ public class ImportDatabase {
     }
   }
   
-  private static void importIndexes(Collection<Table> tables) throws Exception {
+  private static void importIndexes(Tenant tenant, Collection<Table> tables) throws Exception {
 
-    RefTableType indexType = refTableTypeRepository.findOne(Constant.INDEX_TYPE); 
+    RefTableType indexType = refTableTypeRepository.findOne(tenant.getId(), Constant.INDEX_TYPE); 
     if (indexType == null) {
       throw new Exception ("Index Type Table Type not found! Terminating...");
     }
     RefTables uniqueIndex = refTablesRepository.findOne(indexType.getId(), Constant.UNIQUE_INDEX);
     RefTables nonUniqueIndex = refTablesRepository.findOne(indexType.getId(), Constant.INDEX);
 
-    RefTableType rtSortOrder = refTableTypeRepository.findOne(Constant.SORT_ORDER); 
+    RefTableType rtSortOrder = refTableTypeRepository.findOne(tenant.getId(), Constant.SORT_ORDER); 
     if (rtSortOrder == null) {
       throw new Exception ("Sort Order Table Type not found! Terminating...");
     }

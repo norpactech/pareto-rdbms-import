@@ -6,11 +6,17 @@ package com.norpactech.pf.rdbms.repository;
  */
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.UUID;
+import com.norpactech.pf.utils.ApiResponse;
+import com.norpactech.pf.rdbms.dto.ContextPostApiRequest;
+import com.norpactech.pf.rdbms.dto.ContextPutApiRequest;
+import com.norpactech.pf.rdbms.dto.ContextDeleteApiRequest;
 
 import com.norpactech.pf.rdbms.model.Context;
 
-public class ContextRepository extends ParetoApiRepository<Context> {
-
+public class ContextRepository extends ParetoNativeRepository<Context> {
+  
   private static final String RELATIVE_URL = "/context";
 
   @Override
@@ -18,7 +24,27 @@ public class ContextRepository extends ParetoApiRepository<Context> {
     return RELATIVE_URL;
   }
 
+  public Context get(UUID id) throws Exception {
+    return super.findOne(Context.class, new HashMap<>(Map.of("id", id)));
+  }
+
   public Context findOne(String name) throws Exception {
-    return findOne(Context.class, new HashMap<>(Map.of("name", name)));
+    return super.findOne(Context.class, new HashMap<>(Map.of("name", name)));
+  }
+  
+  public List<Context> find(Map<String, Object> params) throws Exception {
+    return super.find(Context.class, params);
+  }
+    
+  public ApiResponse save(ContextPostApiRequest request) throws Exception {
+    return super.post(toParams(request));
   }  
+  
+  public ApiResponse save(ContextPutApiRequest request) throws Exception {
+    return super.put(toParams(request));
+  } 
+
+  public ApiResponse delete(ContextDeleteApiRequest request) throws Exception {
+    return super.delete(toParams(request));
+  }
 }

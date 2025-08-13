@@ -7,27 +7,36 @@ package com.norpactech.pf.rdbms.repository;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.norpactech.pf.rdbms.config.ParetoAPI;
-import com.norpactech.pf.rdbms.utils.ApiGetRequest;
-import com.norpactech.pf.rdbms.utils.ApiResponse;
-import com.norpactech.pf.rdbms.utils.TextUtils;
+import com.norpactech.pf.config.ParetoAPI;
+import com.norpactech.pf.utils.ApiGetRequest;
+import com.norpactech.pf.utils.ApiResponse;
+import com.norpactech.pf.utils.TextUtils;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 
-public abstract class ParetoApiRepository<T> {
+public abstract class ParetoNativeRepository<T> {
 
   protected abstract String getRelativeURL();
 
-  public T findOne(Class<T> entityType, Map<String, String> queryParams) throws Exception {
-    ApiGetRequest request = new ApiGetRequest(entityType, getRelativeURL(), queryParams);
-    ApiResponse response = get(request);
+  public T findOne(Class<T> entityType, Map<String, Object> queryParams) throws Exception {
+    
+    var toStringMap = new HashMap<String, String>();
+    for (String key : queryParams.keySet()) {
+      Object val = queryParams.get(key);
+      if (val != null) {
+        toStringMap.put(key, val.toString());
+      }
+    }
+    var request = new ApiGetRequest(entityType, getRelativeURL(), toStringMap);
+    var response = get(request);
 
     if (response.getData() == null) {
       return null;
@@ -35,8 +44,16 @@ public abstract class ParetoApiRepository<T> {
     return response.readObject(entityType);
   }
   
-  public List<T> find(Class<T> entityType, Map<String, String> queryParams) throws Exception {
-    ApiGetRequest request = new ApiGetRequest(entityType, getRelativeURL(), queryParams);
+  public List<T> find(Class<T> entityType, Map<String, Object> queryParams) throws Exception {
+
+    var toStringMap = new HashMap<String, String>();
+    for (String key : queryParams.keySet()) {
+      Object val = queryParams.get(key);
+      if (val != null) {
+        toStringMap.put(key, val.toString());
+      }
+    }
+    ApiGetRequest request = new ApiGetRequest(entityType, getRelativeURL(), toStringMap);
     request.setUri(getRelativeURL() + "/find");
     
     ApiResponse response = get(request);
@@ -105,18 +122,44 @@ public abstract class ParetoApiRepository<T> {
     return new Gson().fromJson(response.body().string(), ApiResponse.class);
   }
   
-  public ApiResponse put(Map<String, Object> apiPostRequest) throws Exception {
+  public ApiResponse put(Map<String, Object> apiPutRequest) throws Exception {
 
     String version = ParetoAPI.apiVersion == null ? "" : "/" + ParetoAPI.apiVersion;
     URL url = new URL(ParetoAPI.host + version + getRelativeURL());
 
     OkHttpClient client = new OkHttpClient().newBuilder().build();
-    String jsonBody = new Gson().toJson(apiPostRequest);
+    String jsonBody = new Gson().toJson(apiPutRequest);
     RequestBody requestBody = RequestBody.create(jsonBody, MediaType.get("application/json"));
 
     okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
         .url(url)
         .put(requestBody)
+        .addHeader("Accept", "application/json")
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Authorization", "Bearer " + ParetoAPI.jwt);
+
+    okhttp3.Request request = requestBuilder.build();
+    okhttp3.Response response = client.newCall(request).execute();
+
+    int responseCode = response.code();
+    if (responseCode > 299) {
+        throw new Exception("POST Request Failed: " + response.message());
+    }
+    return new Gson().fromJson(response.body().string(), ApiResponse.class);
+  }
+  
+  public ApiResponse delete(Map<String, Object> apiDeleteRequest) throws Exception {
+
+    String version = ParetoAPI.apiVersion == null ? "" : "/" + ParetoAPI.apiVersion;
+    URL url = new URL(ParetoAPI.host + version + getRelativeURL());
+
+    OkHttpClient client = new OkHttpClient().newBuilder().build();
+    String jsonBody = new Gson().toJson(apiDeleteRequest);
+    RequestBody requestBody = RequestBody.create(jsonBody, MediaType.get("application/json"));
+
+    okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
+        .url(url)
+        .delete(requestBody)
         .addHeader("Accept", "application/json")
         .addHeader("Content-Type", "application/json")
         .addHeader("Authorization", "Bearer " + ParetoAPI.jwt);
