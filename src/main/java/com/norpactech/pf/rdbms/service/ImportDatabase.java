@@ -50,6 +50,7 @@ import com.norpactech.pf.rdbms.repository.GenericPropertyTypeRepository;
 import com.norpactech.pf.rdbms.repository.PropertyRepository;
 import com.norpactech.pf.rdbms.repository.RefTableTypeRepository;
 import com.norpactech.pf.rdbms.repository.RefTablesRepository;
+import com.norpactech.pf.rdbms.repository.TenantRepository;
 import com.norpactech.pf.rdbms.repository.ValidationRepository;
 import com.norpactech.pf.rdbms.vo.ForeignKeyVO;
 import com.norpactech.pf.utils.Constant;
@@ -88,10 +89,11 @@ public class ImportDatabase {
   private static final CardinalityRepository cardinalityRepository = new CardinalityRepository();
   private static final DataIndexRepository dataIndexRepository = new DataIndexRepository();
   private static final DataIndexPropertyRepository dataIndexPropertyRepository = new DataIndexPropertyRepository();
+  private static final TenantRepository tenantRepository = new TenantRepository();
   
   public static void importDatabase(String username, String password, String dbSchema) throws Exception {
     
-    logger.info("Import Database Beginning with Schema: " + ParetoAPI.schema);
+    logger.info("Import Database Beginning with Schema: " + ParetoAPI.schema.getName());
 
     new LoggingConfig(Level.OFF);
 
@@ -107,9 +109,6 @@ public class ImportDatabase {
         .withLoadOptions(loadOptionsBuilder.toOptions());
 
     Catalog catalog = SchemaCrawlerUtility.getCatalog(getDataSource(username, password, dbSchema), options);
-
-//    List<DataObject> dataObjects = new DataObjectRepository().findAll(ParetoAPI.schema.getId());
-        
     Schema catalogSchema = catalog.getSchemas().stream()
         .filter(schema -> schema.getCatalogName().equals(dbSchema))
         .findFirst()
@@ -124,9 +123,9 @@ public class ImportDatabase {
     }
     Collection<Table> tables = catalog.getTables(catalogSchema);
     importTables(tables, paretoContext);    
-    importCardinality(ParetoAPI.tenant, tables);    
-    importIndexes(ParetoAPI.tenant, tables);    
-    logger.info("Import Database Completed with Schema: " + ParetoAPI.schema);
+    importCardinality(tables);    
+    importIndexes(tables);    
+    logger.info("Import Database Completed with Schema: " + ParetoAPI.schema.getName());
   }
 
   private static void importTables(Collection<Table> tables, Context paretoContext) throws Exception {
@@ -287,7 +286,12 @@ public class ImportDatabase {
     throw new Exception("Unsupported Context Data Type! '" + columnDataType + ", " + table.getName() + " - " + column.getName() + "' Terminating...");
   }
   
-  private static void importCardinality(Tenant tenant, Collection<Table> tables) throws Exception {
+  private static void importCardinality(Collection<Table> tables) throws Exception {
+    
+    Tenant tenant = tenantRepository.findOne(Constant.SYSTEM_TENANT);
+    if (tenant == null) {
+      throw new Exception ("System Tenant " + Constant.SYSTEM_TENANT + " not found! Terminating...");
+    }
 
     RefTableType cardinalityTT = refTableTypeRepository.findOne(tenant.getId(), Constant.CARDINALITY_TABLE_TYPE);
     if (cardinalityTT == null) {
@@ -380,7 +384,12 @@ public class ImportDatabase {
     }
   }
   
-  private static void importIndexes(Tenant tenant, Collection<Table> tables) throws Exception {
+  private static void importIndexes(Collection<Table> tables) throws Exception {
+
+    Tenant tenant = tenantRepository.findOne(Constant.SYSTEM_TENANT);
+    if (tenant == null) {
+      throw new Exception ("System Tenant " + Constant.SYSTEM_TENANT + " not found! Terminating...");
+    }
 
     RefTableType indexType = refTableTypeRepository.findOne(tenant.getId(), Constant.INDEX_TYPE); 
     if (indexType == null) {
