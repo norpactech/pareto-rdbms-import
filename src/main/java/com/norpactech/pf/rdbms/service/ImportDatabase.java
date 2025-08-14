@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.norpactech.pf.config.ParetoAPI;
+import com.norpactech.pf.config.ConfiguredAPI;
 import com.norpactech.pf.rdbms.dto.CardinalityPostApiRequest;
 import com.norpactech.pf.rdbms.dto.CardinalityPutApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPostApiRequest;
@@ -96,7 +96,7 @@ public class ImportDatabase {
   
   public static void importDatabase(String username, String password, String dbSchema) throws Exception {
     
-    logger.info("Import Database Beginning with Schema: " + ParetoAPI.schema.getName());
+    logger.info("Import Database Beginning with Schema: " + ConfiguredAPI.schema.getName());
 
     new LoggingConfig(Level.OFF);
 
@@ -128,13 +128,13 @@ public class ImportDatabase {
     importTables(tables, paretoContext);    
     importCardinality(tables);    
     importIndexes(tables);    
-    logger.info("Import Database Completed with Schema: " + ParetoAPI.schema.getName());
+    logger.info("Import Database Completed with Schema: " + ConfiguredAPI.schema.getName());
   }
 
   private static void importTables(Collection<Table> tables, Context paretoContext) throws Exception {
 
     for (final Table table : tables) {
-      DataObject dataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), table.getName());
+      DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
 
       boolean hasIdentifier = false;
       boolean hasAudit = false;
@@ -168,7 +168,7 @@ public class ImportDatabase {
 
       if (dataObject == null) {
         var request = new DataObjectPostApiRequest();
-        request.setIdSchema(ParetoAPI.schema.getId());
+        request.setIdSchema(ConfiguredAPI.schema.getId());
         request.setName(table.getName());
         request.setDescription("Created " + table.getName() + " from Import");
         request.setHasIdentifier(hasIdentifier);
@@ -198,7 +198,7 @@ public class ImportDatabase {
 
   private static void importProperties(Context context, Table table) throws Exception {
     
-    DataObject dataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), table.getName());
+    DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
     List<ContextDataType> contextDataTypes = contextDataTypeRepository.find(Map.of("idContext", context.getId()));
 
     int i = 1;
@@ -231,7 +231,7 @@ public class ImportDatabase {
       var contextDataType = getContextDataType(contextDataTypes, table, column);
       UUID idGenericDataType = contextDataType.getIdGenericDataType();
       // Validation
-      Validation validation = validationRepository.findOne(ParetoAPI.tenant.getId(), column.getName());
+      Validation validation = validationRepository.findOne(ConfiguredAPI.tenant.getId(), column.getName());
       UUID idValidation = validation == null ? null : validation.getId();
       // Generic Property Type
       GenericPropertyType genericPropertyType = genericPropertyTypeRepository.findOne(idGenericDataType, column.getName());
@@ -370,7 +370,7 @@ public class ImportDatabase {
     }
     for (ForeignKeyVO fk : foreignKeys) {
 
-      DataObject tableDataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), fk.getTable());
+      DataObject tableDataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), fk.getTable());
       if (tableDataObject == null) {
         throw new Exception ("Foreign Key Table Data Object '" + fk.getTable() + "' not Found! Terminating...");
       }
@@ -378,7 +378,7 @@ public class ImportDatabase {
       if (foreignKeyProperty == null) {
         throw new Exception ("Foreign Key Property '" + fk.getForeignKey() + "' not Found! Terminating...");
       }
-      DataObject referencesDataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), fk.getReferences());
+      DataObject referencesDataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), fk.getReferences());
       if (referencesDataObject == null) {
         throw new Exception ("Foreign Key References Data Object '" + fk.getReferences() + "' not Found! Terminating...");
       }      
@@ -441,7 +441,7 @@ public class ImportDatabase {
     RefTables descending = refTablesRepository.findOne(rtSortOrder.getId(), Constant.DESCENDING);
     
     for (Table table : tables) {
-      DataObject dataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), table.getName());
+      DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
 
       for (Index index : table.getIndexes()) {
         String indexName = index.getName().equalsIgnoreCase("PRIMARY") ? "primary_key" : index.getName().toLowerCase();

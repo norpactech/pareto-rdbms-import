@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.norpactech.pf.config.Datasource;
-import com.norpactech.pf.config.ParetoAPI;
+import com.norpactech.pf.config.ConfiguredAPI;
 import com.norpactech.pf.rdbms.service.ImportDatabase;
 
 public class Application {
@@ -85,7 +85,7 @@ public class Application {
     try {
       logger.info("Pareto Factory Import Beginning");
       
-      ParetoAPI.configure(factoryURL, apiVersion, tenant, schema, username, password);
+      ConfiguredAPI.configure(factoryURL, apiVersion, tenant, schema, username, password);
       
       ImportDatabase.importDatabase(dbUsername, dbPassword, dbSchema);
       
