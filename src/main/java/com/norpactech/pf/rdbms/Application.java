@@ -28,6 +28,7 @@ public class Application {
 
     String dbUsername = System.getenv("DB_USERNAME");
     String dbPassword = System.getenv("DB_PASSWORD");
+    String dbSchema   = System.getenv("DB_SCHEMA");
     
     username = "scott@norpactech.com";
     password = "G00seEgg!";
@@ -37,6 +38,7 @@ public class Application {
     schema = "united-bins";
     dbUsername = "root";
     dbPassword = "password";
+    dbSchema = "ub";
         
     logger.info("Beginning Pareto Build");
 
@@ -85,7 +87,7 @@ public class Application {
       
       ParetoAPI.configure(factoryURL, apiVersion, tenant, schema, username, password);
       
-      ImportDatabase.importDatabase(dbUsername, dbPassword, ParetoAPI.dbSchema);
+      ImportDatabase.importDatabase(dbUsername, dbPassword, dbSchema);
       
       logger.info("Pareto Factory Import Completed Successfully");
       System.exit(0);

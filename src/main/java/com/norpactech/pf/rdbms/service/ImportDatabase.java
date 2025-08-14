@@ -34,6 +34,7 @@ import com.norpactech.pf.rdbms.model.ContextDataType;
 import com.norpactech.pf.rdbms.model.DataIndex;
 import com.norpactech.pf.rdbms.model.DataIndexProperty;
 import com.norpactech.pf.rdbms.model.DataObject;
+import com.norpactech.pf.rdbms.model.GenericDataTypeAttribute;
 import com.norpactech.pf.rdbms.model.GenericPropertyType;
 import com.norpactech.pf.rdbms.model.Property;
 import com.norpactech.pf.rdbms.model.RefTableType;
@@ -46,6 +47,7 @@ import com.norpactech.pf.rdbms.repository.ContextRepository;
 import com.norpactech.pf.rdbms.repository.DataIndexPropertyRepository;
 import com.norpactech.pf.rdbms.repository.DataIndexRepository;
 import com.norpactech.pf.rdbms.repository.DataObjectRepository;
+import com.norpactech.pf.rdbms.repository.GenericDataTypeAttributeRepository;
 import com.norpactech.pf.rdbms.repository.GenericPropertyTypeRepository;
 import com.norpactech.pf.rdbms.repository.PropertyRepository;
 import com.norpactech.pf.rdbms.repository.RefTableTypeRepository;
@@ -90,6 +92,7 @@ public class ImportDatabase {
   private static final DataIndexRepository dataIndexRepository = new DataIndexRepository();
   private static final DataIndexPropertyRepository dataIndexPropertyRepository = new DataIndexPropertyRepository();
   private static final TenantRepository tenantRepository = new TenantRepository();
+  private static final GenericDataTypeAttributeRepository genericDataTypeAttributeRepository = new GenericDataTypeAttributeRepository();
   
   public static void importDatabase(String username, String password, String dbSchema) throws Exception {
     
@@ -201,6 +204,30 @@ public class ImportDatabase {
     int i = 1;
     for (final Column column : table.getColumns()) {
 
+      if (dataObject.getHasIdentifier() == true 
+      && column.getName().equalsIgnoreCase("ID")) {
+        continue;
+      }
+      else if (dataObject.getHasActive() == true 
+      && column.getName().equalsIgnoreCase("IS_ACTIVE")) {
+        continue;
+      }
+      else if (dataObject.getHasAudit() == true 
+      && column.getName().equalsIgnoreCase("CREATED_AT")) {
+        continue;
+      }
+      else if (dataObject.getHasAudit() == true 
+      && column.getName().equalsIgnoreCase("CREATED_BY")) {
+        continue;
+      }
+      else if (dataObject.getHasAudit() == true 
+      && column.getName().equalsIgnoreCase("UPDATED_AT")) {
+        continue;
+      }
+      else if (dataObject.getHasAudit() == true 
+      && column.getName().equalsIgnoreCase("UPDATED_BY")) {
+        continue;
+      }      
       var contextDataType = getContextDataType(contextDataTypes, table, column);
       UUID idGenericDataType = contextDataType.getIdGenericDataType();
       // Validation
@@ -211,6 +238,19 @@ public class ImportDatabase {
       UUID idGenericPropertyType = genericPropertyType == null ? null : genericPropertyType.getId();
       
       Property property = propertyRepository.findOne(dataObject.getId(), column.getName());
+      
+      var genericDataTypeAttributes = genericDataTypeAttributeRepository.find(Map.of("idGenericDataType", idGenericDataType));
+      Integer length = null;
+      Integer digits = null;
+      
+      for (GenericDataTypeAttribute genericDataTypeAttribute : genericDataTypeAttributes) {
+        if (genericDataTypeAttribute.getName().equalsIgnoreCase("length")) {
+          length = column.getSize();
+        }
+        if (genericDataTypeAttribute.getName().equalsIgnoreCase("precision")) {
+          digits = column.getDecimalDigits();
+        }
+      }
       
       if (property == null) {
         var request = new PropertyPostApiRequest();
@@ -227,8 +267,8 @@ public class ImportDatabase {
         request.setDescription(column.getRemarks());
         request.setIsUpdatable(true);
         request.setFkViewable(false);
-        request.setLength(column.getSize());
-        request.setScale(column.getDecimalDigits());
+        request.setLength(length);
+        request.setScale(digits);
         request.setIsNullable(column.isNullable());
         request.setDefaultValue(column.getDefaultValue());
         request.setCreatedBy("RDBMS Import Post");
@@ -249,8 +289,8 @@ public class ImportDatabase {
         request.setDescription(column.getRemarks());
         request.setIsUpdatable(property.getIsUpdatable());
         request.setFkViewable(property.getFkViewable());
-        request.setLength(column.getSize());
-        request.setScale(column.getDecimalDigits());
+        request.setLength(length);
+        request.setScale(digits);
         request.setIsNullable(column.isNullable());
         request.setDefaultValue(column.getDefaultValue());
         request.setUpdatedAt(property.getUpdatedAt());
@@ -341,12 +381,7 @@ public class ImportDatabase {
       DataObject referencesDataObject = dataObjectRepository.findOne(ParetoAPI.schema.getId(), fk.getReferences());
       if (referencesDataObject == null) {
         throw new Exception ("Foreign Key References Data Object '" + fk.getReferences() + "' not Found! Terminating...");
-      }
-      Property primaryKeyProperty = propertyRepository.findOne(referencesDataObject.getId(), fk.getPrimaryKey());
-      if (primaryKeyProperty == null) {
-        throw new Exception ("Primary Key Property '" + fk.getPrimaryKey() + "' not Found! Terminating...");
-      }
-      
+      }      
       Cardinality cardinality = cardinalityRepository.findOne(referencesDataObject.getId(), foreignKeyProperty.getId());
       
       if (cardinality == null) {
@@ -410,7 +445,10 @@ public class ImportDatabase {
 
       for (Index index : table.getIndexes()) {
         String indexName = index.getName().equalsIgnoreCase("PRIMARY") ? "primary_key" : index.getName().toLowerCase();
-        // Don't process foreign keys, as that is done in cardinality and plug-ins
+        if (indexName.equals("primary_key")
+        &&  dataObject.getHasIdentifier()) {
+          continue;
+        }
         if (indexName.startsWith("fk_")) {
           continue;
         }
