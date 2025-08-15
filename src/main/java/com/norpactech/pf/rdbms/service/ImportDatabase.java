@@ -251,7 +251,28 @@ public class ImportDatabase {
           digits = column.getDecimalDigits();
         }
       }
-      
+      /*
+       * Sometimes true/false is expressed by 0/1 (false/true) - i.e. MySQL.
+       * ... override this behavior.
+       */
+      String defaultValue = null;
+      if (contextDataType.getAlias().equalsIgnoreCase("boolean")
+      &&  StringUtils.isNotEmpty(column.getDefaultValue())) {
+        
+        if (column.getDefaultValue().equals("0")) {
+          defaultValue = "FALSE";
+        }
+        else if (column.getDefaultValue().equals("1")) {
+          defaultValue = "TRUE";
+        }
+        else {
+          defaultValue = column.getDefaultValue(); 
+        }
+      }
+      else {
+        defaultValue = column.getDefaultValue(); 
+      }
+
       if (property == null) {
         var request = new PropertyPostApiRequest();
         request.setIdDataObject(dataObject.getId());
@@ -270,7 +291,7 @@ public class ImportDatabase {
         request.setLength(length);
         request.setScale(digits);
         request.setIsNullable(column.isNullable());
-        request.setDefaultValue(column.getDefaultValue());
+        request.setDefaultValue(defaultValue);
         request.setCreatedBy("RDBMS Import Post");
         propertyRepository.save(request);
       }
@@ -292,7 +313,7 @@ public class ImportDatabase {
         request.setLength(length);
         request.setScale(digits);
         request.setIsNullable(column.isNullable());
-        request.setDefaultValue(column.getDefaultValue());
+        request.setDefaultValue(defaultValue);
         request.setUpdatedAt(property.getUpdatedAt());
         request.setUpdatedBy("RDBMS Import Put");
         propertyRepository.save(request);
