@@ -182,7 +182,7 @@ public class ImportDatabase {
         var request = new DataObjectPutApiRequest();
         request.setId(dataObject.getId());
         request.setName(dataObject.getName());
-        request.setDescription("RDBMS Import Update");
+        request.setDescription("Created " + table.getName() + " from Import");
         request.setHasIdentifier(hasIdentifier);
         request.setHasAudit(hasAudit);
         request.setHasActive(hasActive);
