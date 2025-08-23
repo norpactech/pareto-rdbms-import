@@ -24,8 +24,10 @@ import com.norpactech.pf.rdbms.dto.DataIndexPostApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPropertyPostApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPropertyPutApiRequest;
 import com.norpactech.pf.rdbms.dto.DataIndexPutApiRequest;
+import com.norpactech.pf.rdbms.dto.DataObjectDeleteApiRequest;
 import com.norpactech.pf.rdbms.dto.DataObjectPostApiRequest;
 import com.norpactech.pf.rdbms.dto.DataObjectPutApiRequest;
+import com.norpactech.pf.rdbms.dto.PropertyDeleteApiRequest;
 import com.norpactech.pf.rdbms.dto.PropertyPostApiRequest;
 import com.norpactech.pf.rdbms.dto.PropertyPutApiRequest;
 import com.norpactech.pf.rdbms.model.Cardinality;
@@ -58,17 +60,14 @@ import com.norpactech.pf.rdbms.vo.ForeignKeyVO;
 import com.norpactech.pf.utils.Constant;
 import com.norpactech.pf.utils.TextUtils;
 
-import schemacrawler.schema.Catalog;
 import schemacrawler.schema.Column;
 import schemacrawler.schema.ColumnReference;
 import schemacrawler.schema.ForeignKey;
 import schemacrawler.schema.Index;
 import schemacrawler.schema.IndexColumn;
-import schemacrawler.schema.Schema;
 import schemacrawler.schema.Table;
 import schemacrawler.schemacrawler.LimitOptionsBuilder;
 import schemacrawler.schemacrawler.LoadOptionsBuilder;
-import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaCrawlerOptionsBuilder;
 import schemacrawler.schemacrawler.SchemaInfoLevelBuilder;
 import schemacrawler.tools.utility.SchemaCrawlerUtility;
@@ -100,19 +99,19 @@ public class ImportDatabase {
 
     new LoggingConfig(Level.OFF);
 
-    LimitOptionsBuilder limitOptionsBuilder =
+    var limitOptionsBuilder =
       LimitOptionsBuilder.builder().includeSchemas("ub"::equals);
 
-    LoadOptionsBuilder loadOptionsBuilder =
+    var loadOptionsBuilder =
       LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.standard());
     
-    SchemaCrawlerOptions options =
+    var options =
       SchemaCrawlerOptionsBuilder.newSchemaCrawlerOptions()
         .withLimitOptions(limitOptionsBuilder.toOptions())
         .withLoadOptions(loadOptionsBuilder.toOptions());
 
-    Catalog catalog = SchemaCrawlerUtility.getCatalog(getDataSource(username, password, dbSchema), options);
-    Schema catalogSchema = catalog.getSchemas().stream()
+    var catalog = SchemaCrawlerUtility.getCatalog(getDataSource(username, password, dbSchema), options);
+    var catalogSchema = catalog.getSchemas().stream()
         .filter(schema -> schema.getCatalogName().equals(dbSchema))
         .findFirst()
         .orElse(null);
@@ -124,13 +123,52 @@ public class ImportDatabase {
     if (paretoContext == null) {
       throw new Exception("Pareto Context Not Found! Terminating...");
     }
-    Collection<Table> tables = catalog.getTables(catalogSchema);
+    var tables = catalog.getTables(catalogSchema);
+    var dataObjects = dataObjectRepository.find(Map.of("idSchema", ConfiguredAPI.schema.getId())); 
+
+    removeOrphanedDataObjects(tables, dataObjects);
     importTables(tables, paretoContext);    
     importCardinality(tables);    
     importIndexes(tables);    
     logger.info("Import Database Completed with Schema: " + ConfiguredAPI.schema.getName());
   }
+  /**
+   * Remove any data objects whose associated table no longer exists
+   * in the source database.
+   */
+  private static void removeOrphanedDataObjects(
+      Collection<Table> tables, 
+      Collection<DataObject> dataObjects) throws Exception {
 
+    var deleteRequests = new ArrayList<DataObjectDeleteApiRequest>();
+    
+    for (var dataObject : dataObjects) {
+      boolean exists = false;
+      for (Table table : tables) {
+        if (table.getName().equalsIgnoreCase(dataObject.getName())) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        var request = new DataObjectDeleteApiRequest();
+        request.setId(dataObject.getId());
+        request.setUpdatedAt(dataObject.getUpdatedAt());
+        request.setUpdatedBy("RDBMS Import Delete");
+        deleteRequests.add(request);
+      }
+    }
+    for (var request : deleteRequests) {
+      var response = dataObjectRepository.delete(request);
+      if (response.getData() != null) {
+        logger.info("DataObject '{}' removed.", request.getId());
+      }
+      else {
+        logger.warn("Ophaned Data Object '{}' was not removed! {}", request.getId(), response.getError());
+      }
+    }
+  }
+  
   private static void importTables(Collection<Table> tables, Context paretoContext) throws Exception {
 
     for (final Table table : tables) {
@@ -190,12 +228,74 @@ public class ImportDatabase {
         request.setUpdatedBy("RDBMS Import Put");
 
         dataObjectRepository.save(request);
-      }      
+      }
+      removeOrphanedProperties(table, dataObject);
       importProperties(paretoContext, table);
       logger.info("DataObject '" + table.getName() + "' imported.");
     }
   }
+  /**
+   * Remove any properties whose associated table column no longer exists
+   * in the source database.
+   */
+  private static void removeOrphanedProperties(
+      Table table, 
+      DataObject dataObject) throws Exception {
 
+    var deleteRequests = new ArrayList<PropertyDeleteApiRequest>();
+    var properties =  propertyRepository.find(Map.of("idDataObject", dataObject.getId()));
+
+    for (var property : properties) {
+      boolean exists = false;
+      for (var column : table.getColumns()) {
+        if (dataObject.getHasIdentifier() == true 
+        && column.getName().equalsIgnoreCase("ID")) {
+          continue;
+        }
+        else if (dataObject.getHasActive() == true 
+        && column.getName().equalsIgnoreCase("IS_ACTIVE")) {
+          continue;
+        }
+        else if (dataObject.getHasAudit() == true 
+        && column.getName().equalsIgnoreCase("CREATED_AT")) {
+          continue;
+        }
+        else if (dataObject.getHasAudit() == true 
+          && column.getName().equalsIgnoreCase("CREATED_BY")) {
+          continue;
+        }
+        else if (dataObject.getHasAudit() == true 
+        && column.getName().equalsIgnoreCase("UPDATED_AT")) {
+          continue;
+        }
+        else if (dataObject.getHasAudit() == true 
+        && column.getName().equalsIgnoreCase("UPDATED_BY")) {
+          continue;
+        }
+        if (column.getName().equalsIgnoreCase(property.getName())) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        var request = new PropertyDeleteApiRequest();
+        request.setId(property.getId());
+        request.setUpdatedAt(property.getUpdatedAt());
+        request.setUpdatedBy("RDBMS Import Delete");
+        deleteRequests.add(request);
+      }
+    }
+    for (var request : deleteRequests) {
+      var response = propertyRepository.delete(request);
+      if (response.getData() != null) {
+        logger.info("Ophaned Property '" + request.getId() + "' removed.");
+      }
+      else {
+        logger.warn("Ophaned Property '{}' was not removed! {}", request.getId(), response.getError());
+      }
+    }
+  }
+  
   private static void importProperties(Context context, Table table) throws Exception {
     
     DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
@@ -543,4 +643,4 @@ public class ImportDatabase {
     return DatabaseConnectionSources.newDatabaseConnectionSource(
         connectionUrl, new MultiUseUserCredentials(username, password));
   }
-}  
+}
