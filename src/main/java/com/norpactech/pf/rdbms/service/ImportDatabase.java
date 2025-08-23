@@ -686,26 +686,27 @@ public class ImportDatabase {
             var request = new PropertyPutApiRequest();
             request.setId(property.getId());
             request.setIdGenericDataType(property.getIdGenericDataType());
-            if (property.getIdValidation() != null) {
-              request.setIdValidation(property.getIdValidation());
-            }
-            if (property.getIdGenericPropertyType() != null) {
-              request.setIdGenericPropertyType(property.getIdGenericPropertyType());
-            }
+            request.setIdValidation(property.getIdValidation());
+            request.setIdGenericPropertyType(property.getIdGenericPropertyType());
             request.setSequence(property.getSequence());
             request.setName(property.getName());
             request.setDescription(property.getDescription());
-            request.setIsUpdatable(false); // Key change: set as non-updatable
+            request.setIsUpdatable(false);
             request.setFkViewable(property.getFkViewable());
             request.setLength(property.getLength());
             request.setScale(property.getScale());
             request.setIsNullable(property.getIsNullable());
             request.setDefaultValue(property.getDefaultValue());
             request.setUpdatedAt(property.getUpdatedAt());
-            request.setUpdatedBy("RDBMS Import - Identifying Relationship");
+            request.setUpdatedBy("RDBMS Identifying");
             
-            propertyRepository.save(request);
-            logger.debug("Property '{}' in table '{}' set as non-updatable (identifying relationship)",  property.getName(), tableName);
+            var response = propertyRepository.save(request);
+            if (response.getData() != null) {
+              logger.debug("Property '{}' in table '{}' set as non-updatable (identifying relationship)",  property.getName(), tableName);
+            }
+            else {
+              logger.error("Property '{}' in table '{}' update failed with (identifying relationship)",  property.getName(), tableName, response.getError());
+            }
           }
         }
       }
