@@ -93,7 +93,7 @@ public class Application {
       System.exit(0);
     }
     catch (Exception e) {
-      logger.info("Pareto Factory Import Terminated Unexpectedly: {}", e.getMessage());
+      logger.info("Pareto Factory Import Terminated Unexpectedly: {}", e);
       System.exit(1);
     }
     finally {

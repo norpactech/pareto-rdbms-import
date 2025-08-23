@@ -129,7 +129,8 @@ public class ImportDatabase {
     removeOrphanedDataObjects(tables, dataObjects);
     importTables(tables, paretoContext);    
     importCardinality(tables);    
-    importIndexes(tables);    
+    importIndexes(tables); 
+    importIdentifyingRelationships(tables);
     logger.info("Import Database Completed with Schema: " + ConfiguredAPI.schema.getName());
   }
   /**
@@ -213,8 +214,8 @@ public class ImportDatabase {
         request.setHasAudit(hasAudit);
         request.setHasActive(hasActive);
         request.setCreatedBy("RDBMS Import Post");
-
         dataObjectRepository.save(request);
+        dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
       }
       else {
         var request = new DataObjectPutApiRequest();
@@ -226,9 +227,10 @@ public class ImportDatabase {
         request.setHasActive(hasActive);
         request.setUpdatedAt(dataObject.getUpdatedAt());
         request.setUpdatedBy("RDBMS Import Put");
-
         dataObjectRepository.save(request);
       }
+      
+      
       removeOrphanedProperties(table, dataObject);
       importProperties(paretoContext, table);
       logger.info("DataObject '" + table.getName() + "' imported.");
@@ -372,7 +374,6 @@ public class ImportDatabase {
       else {
         defaultValue = column.getDefaultValue(); 
       }
-
       if (property == null) {
         var request = new PropertyPostApiRequest();
         request.setIdDataObject(dataObject.getId());
@@ -408,7 +409,7 @@ public class ImportDatabase {
         request.setSequence(i++);
         request.setName(column.getName());
         request.setDescription(column.getRemarks());
-        request.setIsUpdatable(property.getIsUpdatable());
+        request.setIsUpdatable(true);
         request.setFkViewable(property.getFkViewable());
         request.setLength(length);
         request.setScale(digits);
@@ -636,6 +637,80 @@ public class ImportDatabase {
         }      
       }
     }   
+  }  
+  /**
+   * Identifying foreign key values (parent/child) should not be updated in the child as a rule.
+   * exceptions, such as a data fix, should be manually handled.
+   */
+  private static void importIdentifyingRelationships(Collection<Table> tables) throws Exception {
+    
+    logger.info("Analyzing identifying relationships...");
+
+    for (var table : tables) {      
+      for (var foreignKey : table.getForeignKeys()) {
+        var tableName = TextUtils.lastDelimetedValue(foreignKey.getDependentTable().getFullName(), ".");
+        var primaryKey = table.getPrimaryKey();
+        if (primaryKey == null) {
+          continue;
+        }
+        for (ColumnReference reference : foreignKey.getColumnReferences()) {
+          var foreignKeyColumn = reference.getForeignKeyColumn();
+          var foreignKeyName = TextUtils.lastDelimetedValue(foreignKeyColumn.getName(), ".");
+          boolean isIdentifying = false;
+
+          for (var tableColumn : table.getColumns()) {
+            if (tableColumn.getName().equals(foreignKeyColumn.getName()) && 
+                tableColumn.isPartOfPrimaryKey()) {
+              isIdentifying = true;
+              break;
+            }
+          }
+          
+          if (isIdentifying) {
+            logger.debug("Found identifying relationship: Table '{}', FK Column '{}'", tableName, foreignKeyName);
+            
+            // Find the DataObject and Property
+            DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), tableName.replace("`", ""));
+            if (dataObject == null) {
+              logger.warn("DataObject not found for table: {}", tableName);
+              continue;
+            }
+            
+            Property property = propertyRepository.findOne(dataObject.getId(), foreignKeyName.replace("`", ""));
+            if (property == null) {
+              logger.warn("Property not found for FK column: {} in table: {}", foreignKeyName, tableName);
+              continue;
+            }
+            
+            // Set the property as non-updatable since it's part of an identifying relationship
+            var request = new PropertyPutApiRequest();
+            request.setId(property.getId());
+            request.setIdGenericDataType(property.getIdGenericDataType());
+            if (property.getIdValidation() != null) {
+              request.setIdValidation(property.getIdValidation());
+            }
+            if (property.getIdGenericPropertyType() != null) {
+              request.setIdGenericPropertyType(property.getIdGenericPropertyType());
+            }
+            request.setSequence(property.getSequence());
+            request.setName(property.getName());
+            request.setDescription(property.getDescription());
+            request.setIsUpdatable(false); // Key change: set as non-updatable
+            request.setFkViewable(property.getFkViewable());
+            request.setLength(property.getLength());
+            request.setScale(property.getScale());
+            request.setIsNullable(property.getIsNullable());
+            request.setDefaultValue(property.getDefaultValue());
+            request.setUpdatedAt(property.getUpdatedAt());
+            request.setUpdatedBy("RDBMS Import - Identifying Relationship");
+            
+            propertyRepository.save(request);
+            logger.debug("Property '{}' in table '{}' set as non-updatable (identifying relationship)",  property.getName(), tableName);
+          }
+        }
+      }
+    }
+    logger.info("Identifying relationships analysis completed.");
   }
   
   private static DatabaseConnectionSource getDataSource(String username, String password, String dbSchema) {
