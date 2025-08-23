@@ -22,7 +22,7 @@ public class CardinalityPutApiRequest {
   private UUID id;
   private UUID idRtCardinality;
   private UUID idRtCardinalityStrength;
-  private Boolean hasReferencialAction;
+  private Boolean hasReferentialAction;
   private Timestamp updatedAt;
   private String updatedBy;
 
@@ -36,7 +36,7 @@ public class CardinalityPutApiRequest {
     request.put("id", this.id);
     request.put("idRtCardinality", this.idRtCardinality);
     request.put("idRtCardinalityStrength", this.idRtCardinalityStrength);
-    request.put("hasReferencialAction", this.hasReferencialAction);
+    request.put("hasReferentialAction", this.hasReferentialAction);
     request.put("updatedAt", this.updatedAt);
     request.put("updatedBy", this.updatedBy);
     return request;
@@ -68,12 +68,12 @@ public class CardinalityPutApiRequest {
     return this.idRtCardinalityStrength = idRtCardinalityStrength;
   }    
     
-  public Boolean getHasReferencialAction() {
-    return this.hasReferencialAction;
+  public Boolean getHasReferentialAction() {
+    return this.hasReferentialAction;
   }
     
-  public Boolean setHasReferencialAction(Boolean hasReferencialAction) {
-    return this.hasReferencialAction = hasReferencialAction;
+  public Boolean setHasReferentialAction(Boolean hasReferentialAction) {
+    return this.hasReferentialAction = hasReferentialAction;
   }    
     
   public Timestamp getUpdatedAt() {

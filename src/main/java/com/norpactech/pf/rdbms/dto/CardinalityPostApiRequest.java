@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Hidden;
   private UUID idDataObject;
   private UUID idRtCardinality;
   private UUID idRtCardinalityStrength;
-  private Boolean hasReferencialAction;
+  private Boolean hasReferentialAction;
   private String createdBy;
 
   public CardinalityPostApiRequest () {}
@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.Hidden;
     request.put("idDataObject", this.idDataObject);
     request.put("idRtCardinality", this.idRtCardinality);
     request.put("idRtCardinalityStrength", this.idRtCardinalityStrength);
-    request.put("hasReferencialAction", this.hasReferencialAction);
+    request.put("hasReferentialAction", this.hasReferentialAction);
     request.put("createdBy", this.createdBy);
     return request;
   }
@@ -75,12 +75,12 @@ import io.swagger.v3.oas.annotations.Hidden;
     return this.idRtCardinalityStrength = idRtCardinalityStrength;
   }    
     
-  public Boolean getHasReferencialAction() {
-    return this.hasReferencialAction;
+  public Boolean getHasReferentialAction() {
+    return this.hasReferentialAction;
   }
     
-  public Boolean setHasReferencialAction(Boolean hasReferencialAction) {
-    return this.hasReferencialAction = hasReferencialAction;
+  public Boolean setHasReferentialAction(Boolean hasReferentialAction) {
+    return this.hasReferentialAction = hasReferentialAction;
   }    
     
   public String getCreatedBy() {

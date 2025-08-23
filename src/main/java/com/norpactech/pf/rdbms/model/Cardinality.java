@@ -22,7 +22,7 @@ public class Cardinality extends BaseModel {
   private String dataObjectName;
   private UUID idRtCardinality;
   private UUID idRtCardinalityStrength;
-  private Boolean hasReferencialAction;
+  private Boolean hasReferentialAction;
   private Timestamp createdAt;
   private String createdBy;
   private Timestamp updatedAt;
@@ -42,7 +42,7 @@ public class Cardinality extends BaseModel {
     String dataObjectName,
     UUID idRtCardinality,
     UUID idRtCardinalityStrength,
-    Boolean hasReferencialAction,
+    Boolean hasReferentialAction,
     Timestamp createdAt,
     String createdBy,
     Timestamp updatedAt,
@@ -56,7 +56,7 @@ public class Cardinality extends BaseModel {
     this.dataObjectName = dataObjectName;
     this.idRtCardinality = idRtCardinality;
     this.idRtCardinalityStrength = idRtCardinalityStrength;
-    this.hasReferencialAction = hasReferencialAction;
+    this.hasReferentialAction = hasReferentialAction;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.updatedAt = updatedAt;
@@ -135,12 +135,12 @@ public class Cardinality extends BaseModel {
     return this.idRtCardinalityStrength = idRtCardinalityStrength;
   }    
     
-  public Boolean getHasReferencialAction() {
-    return this.hasReferencialAction;
+  public Boolean getHasReferentialAction() {
+    return this.hasReferentialAction;
   }
     
-  public Boolean setHasReferencialAction(Boolean hasReferencialAction) {
-    return this.hasReferencialAction = hasReferencialAction;
+  public Boolean setHasReferentialAction(Boolean hasReferentialAction) {
+    return this.hasReferentialAction = hasReferentialAction;
   }    
     
   public Timestamp getCreatedAt() {

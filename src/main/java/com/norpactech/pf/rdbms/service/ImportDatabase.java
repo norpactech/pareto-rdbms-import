@@ -516,7 +516,7 @@ public class ImportDatabase {
         else {
           postRequest.setIdRtCardinalityStrength(composition.getId());
         }
-        postRequest.setHasReferencialAction(true);
+        postRequest.setHasReferentialAction(true);
         postRequest.setCreatedBy("RDBMS Import Post");
         
         cardinalityRepository.save(postRequest);
@@ -531,7 +531,7 @@ public class ImportDatabase {
         else {
           putRequest.setIdRtCardinalityStrength(cardinality.getIdRtCardinalityStrength());
         }
-        putRequest.setHasReferencialAction(cardinality.getHasReferencialAction());
+        putRequest.setHasReferentialAction(cardinality.getHasReferentialAction());
         putRequest.setUpdatedAt(cardinality.getUpdatedAt());
         putRequest.setUpdatedBy("RDBMS Import Put");
         
