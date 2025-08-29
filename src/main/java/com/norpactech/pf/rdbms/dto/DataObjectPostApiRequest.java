@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Hidden;
   private String name;
   private String description;
   private Boolean hasIdentifier;
+  private Boolean hasTenancy;
   private Boolean hasAudit;
   private Boolean hasActive;
   private String createdBy;
@@ -32,11 +33,12 @@ import io.swagger.v3.oas.annotations.Hidden;
   public Map<String, Object> getInsertRequest() {
     
     var request = new LinkedHashMap<String, Object>();
-    request.put("sql", "SELECT pareto.i_data_object(?,?,?,?,?,?,?)");
+    request.put("sql", "SELECT pareto.i_data_object(?,?,?,?,?,?,?,?)");
     request.put("idSchema", this.idSchema);
     request.put("name", this.name);
     request.put("description", this.description);
     request.put("hasIdentifier", this.hasIdentifier);
+    request.put("hasTenancy", this.hasTenancy);
     request.put("hasAudit", this.hasAudit);
     request.put("hasActive", this.hasActive);
     request.put("createdBy", this.createdBy);
@@ -75,6 +77,14 @@ import io.swagger.v3.oas.annotations.Hidden;
     
   public Boolean setHasIdentifier(Boolean hasIdentifier) {
     return this.hasIdentifier = hasIdentifier;
+  }    
+    
+  public Boolean getHasTenancy() {
+    return this.hasTenancy;
+  }
+    
+  public Boolean setHasTenancy(Boolean hasTenancy) {
+    return this.hasTenancy = hasTenancy;
   }    
     
   public Boolean getHasAudit() {

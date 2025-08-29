@@ -23,6 +23,7 @@ public class DataObjectPutApiRequest {
   private String name;
   private String description;
   private Boolean hasIdentifier;
+  private Boolean hasTenancy;
   private Boolean hasAudit;
   private Boolean hasActive;
   private Timestamp updatedAt;
@@ -34,11 +35,12 @@ public class DataObjectPutApiRequest {
   public Map<String, Object> getUpdateRequest() {
     
      var request = new LinkedHashMap<String, Object>();
-    request.put("sql", "SELECT pareto.u_data_object(?,?,?,?,?,?,?,?)");
+    request.put("sql", "SELECT pareto.u_data_object(?,?,?,?,?,?,?,?,?)");
     request.put("id", this.id);
     request.put("name", this.name);
     request.put("description", this.description);
     request.put("hasIdentifier", this.hasIdentifier);
+    request.put("hasTenancy", this.hasTenancy);
     request.put("hasAudit", this.hasAudit);
     request.put("hasActive", this.hasActive);
     request.put("updatedAt", this.updatedAt);
@@ -78,6 +80,14 @@ public class DataObjectPutApiRequest {
     
   public Boolean setHasIdentifier(Boolean hasIdentifier) {
     return this.hasIdentifier = hasIdentifier;
+  }    
+    
+  public Boolean getHasTenancy() {
+    return this.hasTenancy;
+  }
+    
+  public Boolean setHasTenancy(Boolean hasTenancy) {
+    return this.hasTenancy = hasTenancy;
   }    
     
   public Boolean getHasAudit() {

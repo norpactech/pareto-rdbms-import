@@ -21,6 +21,7 @@ public class DataObject extends BaseModel {
   private String name;
   private String description;
   private Boolean hasIdentifier;
+  private Boolean hasTenancy;
   private Boolean hasAudit;
   private Boolean hasActive;
   private Timestamp createdAt;
@@ -41,6 +42,7 @@ public class DataObject extends BaseModel {
     String name,
     String description,
     Boolean hasIdentifier,
+    Boolean hasTenancy,
     Boolean hasAudit,
     Boolean hasActive,
     Timestamp createdAt,
@@ -55,6 +57,7 @@ public class DataObject extends BaseModel {
     this.name = name;
     this.description = description;
     this.hasIdentifier = hasIdentifier;
+    this.hasTenancy = hasTenancy;
     this.hasAudit = hasAudit;
     this.hasActive = hasActive;
     this.createdAt = createdAt;
@@ -123,6 +126,14 @@ public class DataObject extends BaseModel {
     
   public Boolean setHasIdentifier(Boolean hasIdentifier) {
     return this.hasIdentifier = hasIdentifier;
+  }    
+    
+  public Boolean getHasTenancy() {
+    return this.hasTenancy;
+  }
+    
+  public Boolean setHasTenancy(Boolean hasTenancy) {
+    return this.hasTenancy = hasTenancy;
   }    
     
   public Boolean getHasAudit() {
