@@ -211,6 +211,7 @@ public class ImportDatabase {
         request.setName(table.getName());
         request.setDescription("Created " + table.getName() + " from Import");
         request.setHasIdentifier(hasIdentifier);
+        request.setHasTenancy(false);  // TODO: <<< UPDATE ME!!!! >>>
         request.setHasAudit(hasAudit);
         request.setHasActive(hasActive);
         request.setCreatedBy("RDBMS Import Post");
@@ -223,14 +224,13 @@ public class ImportDatabase {
         request.setName(dataObject.getName());
         request.setDescription("Created " + table.getName() + " from Import");
         request.setHasIdentifier(hasIdentifier);
+        request.setHasTenancy(false);  // TODO: <<< UPDATE ME!!!! >>>
         request.setHasAudit(hasAudit);
         request.setHasActive(hasActive);
         request.setUpdatedAt(dataObject.getUpdatedAt());
         request.setUpdatedBy("RDBMS Import Put");
         dataObjectRepository.save(request);
       }
-      
-      
       removeOrphanedProperties(table, dataObject);
       importProperties(paretoContext, table);
       logger.info("DataObject '" + table.getName() + "' imported.");
