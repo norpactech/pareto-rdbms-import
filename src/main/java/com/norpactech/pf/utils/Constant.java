@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Constant {
 
-  public static final String SYSTEM_TENANT = "system";
+  public static final String TENANT_PROPERTY = "id_tenant";
   public static final String SCHEMA_CRAWLER_CONTEXT = "schemacrawler";
     
   public static final String CARDINALITY_TABLE_TYPE = "cardinality";

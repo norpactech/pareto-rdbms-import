@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Hidden;
  */
  public class DataIndexPostApiRequest {
 
+  private UUID idTenant;
   private UUID idDataObject;
   private UUID idRtIndexType;
   private String name;
@@ -28,7 +29,8 @@ import io.swagger.v3.oas.annotations.Hidden;
   public Map<String, Object> getInsertRequest() {
     
     var request = new LinkedHashMap<String, Object>();
-    request.put("sql", "SELECT pareto.i_data_index(?,?,?,?)");
+    request.put("sql", "SELECT pareto.i_data_index(?,?,?,?,?)");
+    request.put("idTenant", this.idTenant);
     request.put("idDataObject", this.idDataObject);
     request.put("idRtIndexType", this.idRtIndexType);
     request.put("name", this.name);
@@ -37,6 +39,14 @@ import io.swagger.v3.oas.annotations.Hidden;
   }
   
   // Getters and Setters...
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
     
   public UUID getIdDataObject() {
     return this.idDataObject;

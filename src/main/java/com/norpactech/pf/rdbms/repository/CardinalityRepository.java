@@ -28,8 +28,8 @@ public class CardinalityRepository extends ParetoNativeRepository<Cardinality> {
     return super.findOne(Cardinality.class, new HashMap<>(Map.of("id", id)));
   }
 
-  public Cardinality findOne(UUID idProperty, UUID idDataObject) throws Exception {
-    return super.findOne(Cardinality.class, new HashMap<>(Map.of("idProperty", idProperty, "idDataObject", idDataObject)));
+  public Cardinality findOne(UUID idTenant, UUID idProperty, UUID idDataObject) throws Exception {
+    return super.findOne(Cardinality.class, new HashMap<>(Map.of("idTenant", idTenant, "idProperty", idProperty, "idDataObject", idDataObject)));
   }
   
   public List<Cardinality> find(Map<String, Object> params) throws Exception {

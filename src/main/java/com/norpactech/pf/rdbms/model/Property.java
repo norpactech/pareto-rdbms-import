@@ -17,6 +17,8 @@ import java.util.UUID;
 public class Property extends BaseModel {
 
   private UUID id;
+  private UUID idTenant;
+  private String tenantName;
   private UUID idDataObject;
   private String dataObjectName;
   private UUID idGenericDataType;
@@ -47,6 +49,8 @@ public class Property extends BaseModel {
 
   public Property (
     UUID id,
+    UUID idTenant,
+    String tenantName,
     UUID idDataObject,
     String dataObjectName,
     UUID idGenericDataType,
@@ -71,6 +75,8 @@ public class Property extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
     this.idDataObject = idDataObject;
     this.dataObjectName = dataObjectName;
     this.idGenericDataType = idGenericDataType;
@@ -100,11 +106,13 @@ public class Property extends BaseModel {
     var matchedParams = paramMatcher(queryParams, Property.class);
     matchedParams.put("sql", 
       "SELECT pareto.property.*, " + 
+      "pareto.tenant.name as tenant_name, " + 
       "pareto.data_object.name as data_object_name, " + 
       "pareto.generic_data_type.name as generic_data_type_name, " + 
       "pareto.generic_property_type.name as generic_property_type_name, " + 
       "pareto.validation.name as validation_name " + 
       "FROM pareto.property " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.property.id_tenant) " + 
       "JOIN pareto.data_object on (pareto.data_object.id = pareto.property.id_data_object) " + 
       "JOIN pareto.generic_data_type on (pareto.generic_data_type.id = pareto.property.id_generic_data_type) " + 
       "LEFT JOIN pareto.generic_property_type on (pareto.generic_property_type.id = pareto.property.id_generic_property_type) " + 
@@ -120,6 +128,22 @@ public class Property extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
+  }    
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
+    
+  public String getTenantName() {
+    return this.tenantName;
+  }
+    
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
   public UUID getIdDataObject() {

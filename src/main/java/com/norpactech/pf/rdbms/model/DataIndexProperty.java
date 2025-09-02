@@ -17,6 +17,8 @@ import java.util.UUID;
 public class DataIndexProperty extends BaseModel {
 
   private UUID id;
+  private UUID idTenant;
+  private String tenantName;
   private UUID idDataIndex;
   private String dataIndexName;
   private UUID idProperty;
@@ -36,6 +38,8 @@ public class DataIndexProperty extends BaseModel {
 
   public DataIndexProperty (
     UUID id,
+    UUID idTenant,
+    String tenantName,
     UUID idDataIndex,
     String dataIndexName,
     UUID idProperty,
@@ -49,6 +53,8 @@ public class DataIndexProperty extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
     this.idDataIndex = idDataIndex;
     this.dataIndexName = dataIndexName;
     this.idProperty = idProperty;
@@ -67,9 +73,11 @@ public class DataIndexProperty extends BaseModel {
     var matchedParams = paramMatcher(queryParams, DataIndexProperty.class);
     matchedParams.put("sql", 
       "SELECT pareto.data_index_property.*, " + 
+      "pareto.tenant.name as tenant_name, " + 
       "pareto.data_index.name as data_index_name, " + 
       "pareto.property.name as property_name " + 
       "FROM pareto.data_index_property " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.data_index_property.id_tenant) " + 
       "JOIN pareto.data_index on (pareto.data_index.id = pareto.data_index_property.id_data_index) " + 
       "JOIN pareto.property on (pareto.property.id = pareto.data_index_property.id_property)");
     return matchedParams;
@@ -83,6 +91,22 @@ public class DataIndexProperty extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
+  }    
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
+    
+  public String getTenantName() {
+    return this.tenantName;
+  }
+    
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
   public UUID getIdDataIndex() {

@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Hidden;
  */
  public class CardinalityPostApiRequest {
 
+  private UUID idTenant;
   private UUID idProperty;
   private UUID idDataObject;
   private UUID idRtCardinality;
@@ -31,7 +32,8 @@ import io.swagger.v3.oas.annotations.Hidden;
   public Map<String, Object> getInsertRequest() {
     
     var request = new LinkedHashMap<String, Object>();
-    request.put("sql", "SELECT pareto.i_cardinality(?,?,?,?,?,?)");
+    request.put("sql", "SELECT pareto.i_cardinality(?,?,?,?,?,?,?)");
+    request.put("idTenant", this.idTenant);
     request.put("idProperty", this.idProperty);
     request.put("idDataObject", this.idDataObject);
     request.put("idRtCardinality", this.idRtCardinality);
@@ -42,6 +44,14 @@ import io.swagger.v3.oas.annotations.Hidden;
   }
   
   // Getters and Setters...
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
     
   public UUID getIdProperty() {
     return this.idProperty;

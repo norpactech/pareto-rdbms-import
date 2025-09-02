@@ -22,7 +22,8 @@ public class Application {
     String password   = System.getenv("PARETO_PASSWORD");
     String factoryURL = System.getenv("PARETO_FACTORY_URL");
     String apiVersion = System.getenv("PARETO_API_VERSION");
-
+    String tenantUUID = System.getenv("PARETO_TENANT_UUID");    
+    
     String tenant = System.getenv("TENANT");
     String schema = System.getenv("SCHEMA");
 
@@ -62,6 +63,11 @@ public class Application {
       System.exit(1);
     }    
 
+    if (StringUtils.isEmpty(tenantUUID)) {
+      logger.error("Null or empty Tenant UUID. Set environment variable: PARETO_TENANT_UUID. Terminating...");
+      System.exit(1);
+    }    
+        
     if (StringUtils.isEmpty(tenant)) {
       logger.error("Null or empty Tenant. Set environment variable: TENANT. Terminating...");
       System.exit(1);

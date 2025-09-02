@@ -41,7 +41,6 @@ import com.norpactech.pf.rdbms.model.GenericPropertyType;
 import com.norpactech.pf.rdbms.model.Property;
 import com.norpactech.pf.rdbms.model.RefTableType;
 import com.norpactech.pf.rdbms.model.RefTables;
-import com.norpactech.pf.rdbms.model.Tenant;
 import com.norpactech.pf.rdbms.model.Validation;
 import com.norpactech.pf.rdbms.repository.CardinalityRepository;
 import com.norpactech.pf.rdbms.repository.ContextDataTypeRepository;
@@ -54,9 +53,9 @@ import com.norpactech.pf.rdbms.repository.GenericPropertyTypeRepository;
 import com.norpactech.pf.rdbms.repository.PropertyRepository;
 import com.norpactech.pf.rdbms.repository.RefTableTypeRepository;
 import com.norpactech.pf.rdbms.repository.RefTablesRepository;
-import com.norpactech.pf.rdbms.repository.TenantRepository;
 import com.norpactech.pf.rdbms.repository.ValidationRepository;
 import com.norpactech.pf.rdbms.vo.ForeignKeyVO;
+import com.norpactech.pf.utils.ApiResponse;
 import com.norpactech.pf.utils.Constant;
 import com.norpactech.pf.utils.TextUtils;
 
@@ -90,7 +89,6 @@ public class ImportDatabase {
   private static final CardinalityRepository cardinalityRepository = new CardinalityRepository();
   private static final DataIndexRepository dataIndexRepository = new DataIndexRepository();
   private static final DataIndexPropertyRepository dataIndexPropertyRepository = new DataIndexPropertyRepository();
-  private static final TenantRepository tenantRepository = new TenantRepository();
   private static final GenericDataTypeAttributeRepository genericDataTypeAttributeRepository = new GenericDataTypeAttributeRepository();
   
   public static void importDatabase(String username, String password, String dbSchema) throws Exception {
@@ -173,7 +171,7 @@ public class ImportDatabase {
   private static void importTables(Collection<Table> tables, Context paretoContext) throws Exception {
 
     for (final Table table : tables) {
-      DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
+      DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), table.getName());
 
       boolean hasIdentifier = false;
       boolean hasAudit = false;
@@ -207,16 +205,17 @@ public class ImportDatabase {
 
       if (dataObject == null) {
         var request = new DataObjectPostApiRequest();
+        request.setIdTenant(ConfiguredAPI.tenant.getId());
         request.setIdSchema(ConfiguredAPI.schema.getId());
         request.setName(table.getName());
         request.setDescription("Created " + table.getName() + " from Import");
         request.setHasIdentifier(hasIdentifier);
-        request.setHasTenancy(false);  // TODO: <<< UPDATE ME!!!! >>>
+        request.setHasTenancy(false);
         request.setHasAudit(hasAudit);
         request.setHasActive(hasActive);
         request.setCreatedBy("RDBMS Import Post");
         dataObjectRepository.save(request);
-        dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
+        dataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), table.getName());
       }
       else {
         var request = new DataObjectPutApiRequest();
@@ -224,7 +223,7 @@ public class ImportDatabase {
         request.setName(dataObject.getName());
         request.setDescription("Created " + table.getName() + " from Import");
         request.setHasIdentifier(hasIdentifier);
-        request.setHasTenancy(false);  // TODO: <<< UPDATE ME!!!! >>>
+        request.setHasTenancy(false);
         request.setHasAudit(hasAudit);
         request.setHasActive(hasActive);
         request.setUpdatedAt(dataObject.getUpdatedAt());
@@ -300,7 +299,7 @@ public class ImportDatabase {
   
   private static void importProperties(Context context, Table table) throws Exception {
     
-    DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
+    DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), table.getName());
     List<ContextDataType> contextDataTypes = contextDataTypeRepository.find(Map.of("idContext", context.getId()));
 
     int i = 1;
@@ -336,10 +335,10 @@ public class ImportDatabase {
       Validation validation = validationRepository.findOne(ConfiguredAPI.tenant.getId(), column.getName());
       UUID idValidation = validation == null ? null : validation.getId();
       // Generic Property Type
-      GenericPropertyType genericPropertyType = genericPropertyTypeRepository.findOne(idGenericDataType, column.getName());
+      GenericPropertyType genericPropertyType = genericPropertyTypeRepository.findOne(ConfiguredAPI.tenant.getId(), idGenericDataType, column.getName());
       UUID idGenericPropertyType = genericPropertyType == null ? null : genericPropertyType.getId();
       
-      Property property = propertyRepository.findOne(dataObject.getId(), column.getName());
+      Property property = propertyRepository.findOne(ConfiguredAPI.tenant.getId(), dataObject.getId(), column.getName());
       
       var genericDataTypeAttributes = genericDataTypeAttributeRepository.find(Map.of("idGenericDataType", idGenericDataType));
       Integer length = null;
@@ -374,8 +373,11 @@ public class ImportDatabase {
       else {
         defaultValue = column.getDefaultValue(); 
       }
+      ApiResponse response = null;
+      
       if (property == null) {
         var request = new PropertyPostApiRequest();
+        request.setIdTenant(ConfiguredAPI.tenant.getId());
         request.setIdDataObject(dataObject.getId());
         request.setIdGenericDataType(idGenericDataType);
         if (idValidation != null) {
@@ -394,7 +396,11 @@ public class ImportDatabase {
         request.setIsNullable(column.isNullable());
         request.setDefaultValue(defaultValue);
         request.setCreatedBy("RDBMS Import Post");
-        propertyRepository.save(request);
+        response = propertyRepository.save(request);
+        
+        if (response.getData() == null) {
+          throw new Exception("Save failed on Property: " + dataObject.getName() + "/" + column.getName() + " " + response.getError());
+        }
       }
       else {
         var request = new PropertyPutApiRequest();
@@ -417,7 +423,30 @@ public class ImportDatabase {
         request.setDefaultValue(defaultValue);
         request.setUpdatedAt(property.getUpdatedAt());
         request.setUpdatedBy("RDBMS Import Put");
-        propertyRepository.save(request);
+        response = propertyRepository.save(request);
+
+        if (response.getData() == null) {
+          throw new Exception("Save failed on Property: " + dataObject.getName() + "/" + column.getName() + " " + response.getError());
+        }
+      }
+      /*
+       * Set the Data Object to "hasTenancy" if an id_tenant property exists.
+       */
+      if (property == null) {
+        property = propertyRepository.findOne(ConfiguredAPI.tenant.getId(), dataObject.getId(), column.getName());
+      }
+      if (property.getName().equalsIgnoreCase(Constant.TENANT_PROPERTY)) {
+        var request = new DataObjectPutApiRequest();
+        request.setId(dataObject.getId());
+        request.setName(dataObject.getName());
+        request.setDescription(dataObject.getDescription());
+        request.setHasIdentifier(dataObject.getHasIdentifier());
+        request.setHasTenancy(true);
+        request.setHasAudit(dataObject.getHasAudit());
+        request.setHasActive(dataObject.getHasActive());
+        request.setUpdatedAt(dataObject.getUpdatedAt());
+        request.setUpdatedBy("RDBMS Import Put");
+        dataObjectRepository.save(request);
       }
     }
   }
@@ -430,9 +459,8 @@ public class ImportDatabase {
     String columnDataType = column.getColumnDataType().getName();
     if (StringUtils.isNotEmpty(column.getWidth())) {
       /*
-       *  TODO: Char(36) is a special data type for UUIDs. This needs to 
-       *  be a documented anomaly. Doubtful if someone would use char(36)
-       *  otherwise.  
+       *  Char(36) is a special data type for UUIDs. This needs to be a documented 
+       *  anomaly. Doubtful if someone would use char(36) otherwise.  
        */
       if (columnDataType.equalsIgnoreCase("char")
       &&  column.getWidth().equalsIgnoreCase("(36)")) { 
@@ -450,25 +478,20 @@ public class ImportDatabase {
   
   private static void importCardinality(Collection<Table> tables) throws Exception {
     
-    Tenant tenant = tenantRepository.findOne(Constant.SYSTEM_TENANT);
-    if (tenant == null) {
-      throw new Exception ("System Tenant " + Constant.SYSTEM_TENANT + " not found! Terminating...");
-    }
-
-    RefTableType cardinalityTT = refTableTypeRepository.findOne(tenant.getId(), Constant.CARDINALITY_TABLE_TYPE);
+    RefTableType cardinalityTT = refTableTypeRepository.findOne(ConfiguredAPI.tenant.getId(), Constant.CARDINALITY_TABLE_TYPE);
     if (cardinalityTT == null) {
       throw new Exception ("Cardinality Table Type not found! Terminating...");
     }
-    RefTables oneToMany = refTablesRepository.findOne(cardinalityTT.getId(), Constant.ONE_TO_MANY);
+    RefTables oneToMany = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), cardinalityTT.getId(), Constant.ONE_TO_MANY);
     if (oneToMany == null) {
       throw new Exception ("M:1 Cardinality not found! Terminating...");
     }
-    RefTableType cardinalityStrengthTT = refTableTypeRepository.findOne(tenant.getId(), Constant.CARDINALITY_STRENGTH_TABLE_TYPE); 
+    RefTableType cardinalityStrengthTT = refTableTypeRepository.findOne(ConfiguredAPI.tenant.getId(), Constant.CARDINALITY_STRENGTH_TABLE_TYPE); 
     if (cardinalityStrengthTT == null) {
       throw new Exception ("Cardinality Strength Table Type not found! Terminating...");
     }
-    RefTables aggregation = refTablesRepository.findOne(cardinalityStrengthTT.getId(), Constant.AGGREGATION);
-    RefTables composition = refTablesRepository.findOne(cardinalityStrengthTT.getId(), Constant.COMPOSITION);
+    RefTables aggregation = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), cardinalityStrengthTT.getId(), Constant.AGGREGATION);
+    RefTables composition = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), cardinalityStrengthTT.getId(), Constant.COMPOSITION);
     
     Set<ForeignKeyVO> foreignKeys = new HashSet<ForeignKeyVO>();
     
@@ -492,22 +515,23 @@ public class ImportDatabase {
     }
     for (ForeignKeyVO fk : foreignKeys) {
 
-      DataObject tableDataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), fk.getTable());
+      DataObject tableDataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), fk.getTable());
       if (tableDataObject == null) {
         throw new Exception ("Foreign Key Table Data Object '" + fk.getTable() + "' not Found! Terminating...");
       }
-      Property foreignKeyProperty = propertyRepository.findOne(tableDataObject.getId(), fk.getForeignKey());
+      Property foreignKeyProperty = propertyRepository.findOne(ConfiguredAPI.tenant.getId(), tableDataObject.getId(), fk.getForeignKey());
       if (foreignKeyProperty == null) {
         throw new Exception ("Foreign Key Property '" + fk.getForeignKey() + "' not Found! Terminating...");
       }
-      DataObject referencesDataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), fk.getReferences());
+      DataObject referencesDataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), fk.getReferences());
       if (referencesDataObject == null) {
         throw new Exception ("Foreign Key References Data Object '" + fk.getReferences() + "' not Found! Terminating...");
       }      
-      Cardinality cardinality = cardinalityRepository.findOne(referencesDataObject.getId(), foreignKeyProperty.getId());
+      Cardinality cardinality = cardinalityRepository.findOne(ConfiguredAPI.tenant.getId(), referencesDataObject.getId(), foreignKeyProperty.getId());
       
       if (cardinality == null) {
         CardinalityPostApiRequest postRequest = new CardinalityPostApiRequest();
+        postRequest.setIdTenant(ConfiguredAPI.tenant.getId());
         postRequest.setIdProperty(foreignKeyProperty.getId());
         postRequest.setIdDataObject(referencesDataObject.getId());
         postRequest.setIdRtCardinality(oneToMany.getId());
@@ -543,27 +567,22 @@ public class ImportDatabase {
   
   private static void importIndexes(Collection<Table> tables) throws Exception {
 
-    Tenant tenant = tenantRepository.findOne(Constant.SYSTEM_TENANT);
-    if (tenant == null) {
-      throw new Exception ("System Tenant " + Constant.SYSTEM_TENANT + " not found! Terminating...");
-    }
-
-    RefTableType indexType = refTableTypeRepository.findOne(tenant.getId(), Constant.INDEX_TYPE); 
+    RefTableType indexType = refTableTypeRepository.findOne(ConfiguredAPI.tenant.getId(), Constant.INDEX_TYPE); 
     if (indexType == null) {
       throw new Exception ("Index Type Table Type not found! Terminating...");
     }
-    RefTables uniqueIndex = refTablesRepository.findOne(indexType.getId(), Constant.UNIQUE_INDEX);
-    RefTables nonUniqueIndex = refTablesRepository.findOne(indexType.getId(), Constant.INDEX);
+    RefTables uniqueIndex = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), indexType.getId(), Constant.UNIQUE_INDEX);
+    RefTables nonUniqueIndex = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), indexType.getId(), Constant.INDEX);
 
-    RefTableType rtSortOrder = refTableTypeRepository.findOne(tenant.getId(), Constant.SORT_ORDER); 
+    RefTableType rtSortOrder = refTableTypeRepository.findOne(ConfiguredAPI.tenant.getId(), Constant.SORT_ORDER); 
     if (rtSortOrder == null) {
       throw new Exception ("Sort Order Table Type not found! Terminating...");
     }
-    RefTables ascending = refTablesRepository.findOne(rtSortOrder.getId(), Constant.ASCENDING);
-    RefTables descending = refTablesRepository.findOne(rtSortOrder.getId(), Constant.DESCENDING);
+    RefTables ascending = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), rtSortOrder.getId(), Constant.ASCENDING);
+    RefTables descending = refTablesRepository.findOne(ConfiguredAPI.tenant.getId(), rtSortOrder.getId(), Constant.DESCENDING);
     
     for (Table table : tables) {
-      DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), table.getName());
+      DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), table.getName());
 
       for (Index index : table.getIndexes()) {
         String indexName = index.getName().equalsIgnoreCase("PRIMARY") ? "primary_key" : index.getName().toLowerCase();
@@ -574,18 +593,19 @@ public class ImportDatabase {
         if (indexName.startsWith("fk_")) {
           continue;
         }
-        DataIndex dataIndex = dataIndexRepository.findOne(dataObject.getId(), indexName);
+        DataIndex dataIndex = dataIndexRepository.findOne(ConfiguredAPI.tenant.getId(), dataObject.getId(), indexName);
         UUID rtIndexType = index.isUnique() ? uniqueIndex.getId() : nonUniqueIndex.getId();
         
         if (dataIndex == null) {
           DataIndexPostApiRequest request = new DataIndexPostApiRequest();
+          request.setIdTenant(ConfiguredAPI.tenant.getId());
           request.setIdDataObject(dataObject.getId());
           request.setIdRtIndexType(rtIndexType);
           request.setName(indexName);
           request.setCreatedBy("RDBMS Import Post");
           dataIndexRepository.save(request); 
 
-          dataIndex = dataIndexRepository.findOne(dataObject.getId(), indexName);
+          dataIndex = dataIndexRepository.findOne(ConfiguredAPI.tenant.getId(), dataObject.getId(), indexName);
         }
         else {
           DataIndexPutApiRequest request = new DataIndexPutApiRequest();
@@ -600,11 +620,11 @@ public class ImportDatabase {
         int sequence = 0;
         for (IndexColumn column : index.getColumns()) {
           String columnName = column.getName().toLowerCase();
-          Property property = propertyRepository.findOne(dataObject.getId(), columnName);
+          Property property = propertyRepository.findOne(ConfiguredAPI.tenant.getId(), dataObject.getId(), columnName);
           if (property == null) {
             throw new Exception ("Null Property on Index Column: " + columnName);
           }
-          DataIndexProperty dataIndexProperty = dataIndexPropertyRepository.findOne(dataIndex.getId(), property.getId());
+          DataIndexProperty dataIndexProperty = dataIndexPropertyRepository.findOne(ConfiguredAPI.tenant.getId(), dataIndex.getId(), property.getId());
           String sortOrder = column.getSortSequence().name();
           UUID idSortOrder = null;
           
@@ -617,6 +637,7 @@ public class ImportDatabase {
             
           if (dataIndexProperty == null) {
             DataIndexPropertyPostApiRequest request = new DataIndexPropertyPostApiRequest();
+            request.setIdTenant(ConfiguredAPI.tenant.getId());
             request.setIdDataIndex(dataIndex.getId());
             request.setIdProperty(property.getId());
             request.setIdRtSortOrder(idSortOrder);
@@ -670,13 +691,13 @@ public class ImportDatabase {
             logger.debug("Found identifying relationship: Table '{}', FK Column '{}'", tableName, foreignKeyName);
             
             // Find the DataObject and Property
-            DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.schema.getId(), tableName.replace("`", ""));
+            DataObject dataObject = dataObjectRepository.findOne(ConfiguredAPI.tenant.getId(), ConfiguredAPI.schema.getId(), tableName.replace("`", ""));
             if (dataObject == null) {
               logger.warn("DataObject not found for table: {}", tableName);
               continue;
             }
             
-            Property property = propertyRepository.findOne(dataObject.getId(), foreignKeyName.replace("`", ""));
+            Property property = propertyRepository.findOne(ConfiguredAPI.tenant.getId(), dataObject.getId(), foreignKeyName.replace("`", ""));
             if (property == null) {
               logger.warn("Property not found for FK column: {} in table: {}", foreignKeyName, tableName);
               continue;

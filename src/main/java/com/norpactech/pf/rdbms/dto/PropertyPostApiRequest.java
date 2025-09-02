@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Hidden;
  */
  public class PropertyPostApiRequest {
 
+  private UUID idTenant;
   private UUID idDataObject;
   private UUID idGenericDataType;
   private UUID idGenericPropertyType;
@@ -40,7 +41,8 @@ import io.swagger.v3.oas.annotations.Hidden;
   public Map<String, Object> getInsertRequest() {
     
     var request = new LinkedHashMap<String, Object>();
-    request.put("sql", "SELECT pareto.i_property(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    request.put("sql", "SELECT pareto.i_property(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    request.put("idTenant", this.idTenant);
     request.put("idDataObject", this.idDataObject);
     request.put("idGenericDataType", this.idGenericDataType);
     request.put("idGenericPropertyType", this.idGenericPropertyType);
@@ -59,6 +61,14 @@ import io.swagger.v3.oas.annotations.Hidden;
   }
   
   // Getters and Setters...
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
     
   public UUID getIdDataObject() {
     return this.idDataObject;

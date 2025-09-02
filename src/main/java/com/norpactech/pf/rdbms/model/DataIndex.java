@@ -16,6 +16,8 @@ import java.util.UUID;
 public class DataIndex extends BaseModel {
 
   private UUID id;
+  private UUID idTenant;
+  private String tenantName;
   private UUID idDataObject;
   private String dataObjectName;
   private UUID idRtIndexType;
@@ -33,6 +35,8 @@ public class DataIndex extends BaseModel {
 
   public DataIndex (
     UUID id,
+    UUID idTenant,
+    String tenantName,
     UUID idDataObject,
     String dataObjectName,
     UUID idRtIndexType,
@@ -44,6 +48,8 @@ public class DataIndex extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
     this.idDataObject = idDataObject;
     this.dataObjectName = dataObjectName;
     this.idRtIndexType = idRtIndexType;
@@ -60,8 +66,10 @@ public class DataIndex extends BaseModel {
     var matchedParams = paramMatcher(queryParams, DataIndex.class);
     matchedParams.put("sql", 
       "SELECT pareto.data_index.*, " + 
+      "pareto.tenant.name as tenant_name, " + 
       "pareto.data_object.name as data_object_name " + 
       "FROM pareto.data_index " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.data_index.id_tenant) " + 
       "JOIN pareto.data_object on (pareto.data_object.id = pareto.data_index.id_data_object)");
     return matchedParams;
   }
@@ -74,6 +82,22 @@ public class DataIndex extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
+  }    
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
+    
+  public String getTenantName() {
+    return this.tenantName;
+  }
+    
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
   public UUID getIdDataObject() {

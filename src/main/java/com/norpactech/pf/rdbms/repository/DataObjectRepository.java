@@ -28,8 +28,8 @@ public class DataObjectRepository extends ParetoNativeRepository<DataObject> {
     return super.findOne(DataObject.class, new HashMap<>(Map.of("id", id)));
   }
 
-  public DataObject findOne(UUID idSchema, String name) throws Exception {
-    return super.findOne(DataObject.class, new HashMap<>(Map.of("idSchema", idSchema, "name", name)));
+  public DataObject findOne(UUID idTenant, UUID idSchema, String name) throws Exception {
+    return super.findOne(DataObject.class, new HashMap<>(Map.of("idTenant", idTenant, "idSchema", idSchema, "name", name)));
   }
   
   public List<DataObject> find(Map<String, Object> params) throws Exception {

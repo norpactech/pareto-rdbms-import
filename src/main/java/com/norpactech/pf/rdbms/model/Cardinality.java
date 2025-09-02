@@ -16,6 +16,8 @@ import java.util.UUID;
 public class Cardinality extends BaseModel {
 
   private UUID id;
+  private UUID idTenant;
+  private String tenantName;
   private UUID idProperty;
   private String propertyName;
   private UUID idDataObject;
@@ -36,6 +38,8 @@ public class Cardinality extends BaseModel {
 
   public Cardinality (
     UUID id,
+    UUID idTenant,
+    String tenantName,
     UUID idProperty,
     String propertyName,
     UUID idDataObject,
@@ -50,6 +54,8 @@ public class Cardinality extends BaseModel {
     Boolean isActive)
  {
     this.id = id;
+    this.idTenant = idTenant;
+    this.tenantName = tenantName;
     this.idProperty = idProperty;
     this.propertyName = propertyName;
     this.idDataObject = idDataObject;
@@ -69,9 +75,11 @@ public class Cardinality extends BaseModel {
     var matchedParams = paramMatcher(queryParams, Cardinality.class);
     matchedParams.put("sql", 
       "SELECT pareto.cardinality.*, " + 
+      "pareto.tenant.name as tenant_name, " + 
       "pareto.property.name as property_name, " + 
       "pareto.data_object.name as data_object_name " + 
       "FROM pareto.cardinality " + 
+      "JOIN pareto.tenant on (pareto.tenant.id = pareto.cardinality.id_tenant) " + 
       "JOIN pareto.property on (pareto.property.id = pareto.cardinality.id_property) " + 
       "JOIN pareto.data_object on (pareto.data_object.id = pareto.cardinality.id_data_object)");
     return matchedParams;
@@ -85,6 +93,22 @@ public class Cardinality extends BaseModel {
     
   public UUID setId(UUID id) {
     return this.id = id;
+  }    
+    
+  public UUID getIdTenant() {
+    return this.idTenant;
+  }
+    
+  public UUID setIdTenant(UUID idTenant) {
+    return this.idTenant = idTenant;
+  }    
+    
+  public String getTenantName() {
+    return this.tenantName;
+  }
+    
+  public String setTenantName(String tenantName) {
+    return this.tenantName = tenantName;
   }    
     
   public UUID getIdProperty() {
