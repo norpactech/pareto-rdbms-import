@@ -31,16 +31,6 @@ public class Application {
     String dbPassword = System.getenv("DB_PASSWORD");
     String dbSchema   = System.getenv("DB_SCHEMA");
     
-    username = "scott@norpactech.com";
-    password = "G00seEgg!";
-    factoryURL = "http://localhost:8087";
-    apiVersion = "v01";
-    tenant = "norpac";
-    schema = "united-bins";
-    dbUsername = "root";
-    dbPassword = "password";
-    dbSchema = "ub";
-        
     logger.info("Beginning Pareto Build");
 
     if (StringUtils.isEmpty(username)) {
