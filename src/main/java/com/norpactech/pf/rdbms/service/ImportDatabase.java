@@ -469,7 +469,8 @@ public class ImportDatabase {
     }
     
     for (ContextDataType contextDataType : contextDataTypes) {
-      if (columnDataType.equalsIgnoreCase(contextDataType.getName())) {
+      if (columnDataType.equalsIgnoreCase(contextDataType.getName())
+      ||  columnDataType.equalsIgnoreCase(contextDataType.getAlias())) {
         return contextDataType;
       }
     }
