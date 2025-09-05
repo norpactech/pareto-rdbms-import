@@ -13,7 +13,7 @@ import com.norpactech.pf.rdbms.enums.EnumStatus;
 import com.norpactech.pf.rdbms.model.Schema;
 import com.norpactech.pf.rdbms.model.Tenant;
 import com.norpactech.pf.rdbms.repository.SchemaRepository;
-import com.norpactech.pf.rdbms.repository.TenantRepository;
+import com.norpactech.pf.rdbms.repository.ex.TenantRepositoryEx;
 import com.norpactech.pf.rdbms.vo.JwtRequestVO;
 import com.norpactech.pf.utils.ApiResponse;
 import com.norpactech.pf.utils.AuthUtils;
@@ -68,8 +68,9 @@ public class ConfiguredAPI {
     jwt = AuthUtils.getJwt(host + "/access-token", jwtRequest);
     logger.info("User '{}' Signed In", jwtRequest.getEmail());
     
-    tenant = new TenantRepository().findOne(tenantName);
+    tenant = new TenantRepositoryEx().findOne(tenantName);
     if (tenant != null) {
+      Globals.setIdTenant(tenant.getId());
       logger.info("Tenant: '{}' Initialized", tenant.getName());
     }
     else {

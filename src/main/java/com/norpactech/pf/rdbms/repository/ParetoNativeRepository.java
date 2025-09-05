@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.norpactech.pf.config.ConfiguredAPI;
+import com.norpactech.pf.config.Globals;
 import com.norpactech.pf.config.GsonConfig;
 import com.norpactech.pf.utils.ApiGetRequest;
 import com.norpactech.pf.utils.ApiResponse;
@@ -91,7 +92,7 @@ public abstract class ParetoNativeRepository<T> {
         .addHeader("Accept", "application/json")
         .addHeader("Content-Type", "application/json")
         .addHeader("Authorization", "Bearer " + ConfiguredAPI.jwt)
-        .addHeader("X-Tenant-ID", System.getenv("PARETO_TENANT_UUID"));
+        .addHeader("X-Tenant-ID", Globals.getIdTenant().toString());
     
     okhttp3.Request request = requestBuilder.build();
     response = client.newCall(request).execute();       
@@ -118,7 +119,7 @@ public abstract class ParetoNativeRepository<T> {
         .addHeader("Accept", "application/json")
         .addHeader("Content-Type", "application/json")
         .addHeader("Authorization", "Bearer " + ConfiguredAPI.jwt)
-        .addHeader("X-Tenant-ID", System.getenv("PARETO_TENANT_UUID"));
+        .addHeader("X-Tenant-ID", Globals.getIdTenant().toString());
 
     okhttp3.Request request = requestBuilder.build();
     okhttp3.Response response = client.newCall(request).execute();
@@ -145,7 +146,7 @@ public abstract class ParetoNativeRepository<T> {
         .addHeader("Accept", "application/json")
         .addHeader("Content-Type", "application/json")
         .addHeader("Authorization", "Bearer " + ConfiguredAPI.jwt)
-        .addHeader("X-Tenant-ID", System.getenv("PARETO_TENANT_UUID"));
+        .addHeader("X-Tenant-ID", Globals.getIdTenant().toString());
 
     okhttp3.Request request = requestBuilder.build();
     okhttp3.Response response = client.newCall(request).execute();
@@ -172,7 +173,7 @@ public abstract class ParetoNativeRepository<T> {
         .addHeader("Accept", "application/json")
         .addHeader("Content-Type", "application/json")
         .addHeader("Authorization", "Bearer " + ConfiguredAPI.jwt)
-        .addHeader("X-Tenant-ID", System.getenv("PARETO_TENANT_UUID"));
+        .addHeader("X-Tenant-ID", Globals.getIdTenant().toString());
 
     okhttp3.Request request = requestBuilder.build();
     okhttp3.Response response = client.newCall(request).execute();
