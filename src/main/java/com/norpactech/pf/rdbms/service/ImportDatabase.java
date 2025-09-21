@@ -98,7 +98,7 @@ public class ImportDatabase {
     new LoggingConfig(Level.OFF);
 
     var limitOptionsBuilder =
-      LimitOptionsBuilder.builder().includeSchemas("ub"::equals);
+      LimitOptionsBuilder.builder().includeSchemas(dbSchema::equals);
 
     var loadOptionsBuilder =
       LoadOptionsBuilder.builder().withSchemaInfoLevel(SchemaInfoLevelBuilder.standard());
